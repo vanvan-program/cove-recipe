@@ -1,0 +1,31 @@
+.tools/
+.gradle/
+.kotlin/
+local.properties
+**/build/
+dist/
+*.jks
+*.keystore
+
+# Local editor settings and credentials
+.idea/
+.vscode/
+.env
+.env.*
+!.env.example
+keystore.properties
+signing.properties
+*.pem
+*.key
+
+# Generated Python files and test database snapshots
+__pycache__/
+*.py[cod]
+*.db
+*.db-wal
+*.db-shm
+/docs/upgrade*/
+
+# Raw local diagnostic output; keep the written verification reports
+/docs/*.txt
+/docs/*-qa.json
