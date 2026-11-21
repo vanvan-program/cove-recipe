@@ -59,3 +59,15 @@ jobs:
           target: google_apis
           disable-animations: true
           script: bash gradlew :app:connectedDebugAndroidTest '-Pandroid.testInstrumentationRunnerArguments.class=cn.myrecipe.app.MigrationDeviceTest,cn.myrecipe.app.RepositoryDeviceTest#recipeSaveEditDeleteCascades,cn.myrecipe.app.RepositoryDeviceTest#trashBackupRetainsIngredientsAndStepsAfterRestore,cn.myrecipe.app.UiDeviceTest#settingsShowsInstalledVersionAndUpdateControls' --max-workers=2 --console=plain
+      - name: Show device test failures
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          for file in Path("app/build/outputs/androidTest-results").rglob("*.xml"):
+              for case in ET.parse(file).iter("testcase"):
+                  failure = case.find("failure")
+                  if failure is not None:
+                      print(case.get("name"), (failure.text or "")[:5000])
+          PY

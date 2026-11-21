@@ -26,12 +26,20 @@ class UiDeviceTest {
     }
     @Test fun settingsShowsInstalledVersionAndUpdateControls() {
         compose.onNodeWithTag("nav-settings").performClick()
-        compose.onNodeWithText("关于版本").performScrollTo().performClick()
+        compose.mainClock.advanceTimeBy(750)
+        compose.waitForIdle()
+        compose.onNodeWithText("关于版本").performScrollTo().assertIsDisplayed().performTouchInput { click() }
+        compose.mainClock.advanceTimeBy(750)
+        compose.waitForIdle()
         val info = compose.activity.packageManager.getPackageInfo(compose.activity.packageName, 0)
         compose.onNodeWithText("当前版本 v" + info.versionName).assertIsDisplayed()
         compose.onNodeWithText("检查更新").assertIsEnabled()
         compose.onNodeWithText("下载源设置").performScrollTo().performClick()
-        compose.onNodeWithText("国内自建下载目录（可选）").performScrollTo().assertIsDisplayed()
+        compose.onNode(hasSetTextAction()).performScrollTo().performTextReplacement("https://example.org/recipes/")
+        compose.onNodeWithText("保存下载源").performScrollTo().performClick()
+        compose.onNodeWithText("下载源已保存").performScrollTo().assertIsDisplayed()
+        assertEquals("https://example.org/recipes/", compose.activity.getSharedPreferences("update_sources", 0).getString("mirror", ""))
+        compose.activity.getSharedPreferences("update_sources", 0).edit().remove("mirror").commit()
     }
 
     @Test fun createRecipeThroughEditor() {
