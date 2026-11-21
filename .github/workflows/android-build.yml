@@ -49,11 +49,26 @@ jobs:
           path: ${{ runner.temp }}/signing-kit/
           if-no-files-found: error
           compression-level: 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: instrumented-apks
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+          retention-days: 1
+  device-tests:
+    needs: apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: instrumented-apks
+          path: app/build/outputs/apk
       - name: Enable emulator acceleration
-        run: |
-          bash gradlew --stop
-          sudo setfacl -m "u:$(id -un):rw" /dev/kvm
-      - name: Test upgrades, recycle bin and version screen on Android 15
+        run: sudo setfacl -m "u:$(id -un):rw" /dev/kvm
+      - name: Run regressions on a fresh Android 15 emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
