@@ -19,10 +19,10 @@
 
 ## Overview
 
-**Cove Recipe** is a Chinese-first, completely offline, local-first Android personal cookbook (minSdk 26 / Android 8.0, targetSdk 36 / Android 16). Built purely for personal cooking workflows: **no account, no network permission, no ads, and no cloud sync**.
+**Cove Recipe** is a Chinese-first, offline-capable, local-first Android personal cookbook (minSdk 26 / Android 8.0, targetSdk 36 / Android 16). Built purely for personal cooking workflows: **no account, no ads, and no cloud sync. The app uses the network when you check for an update or download an APK**.
 
 > [!TIP]
-> Detailed release notes (`1.1.0` – `1.4.0`) have been organized into **[CHANGELOG.md](CHANGELOG.md)**.
+> Detailed release notes (`1.1.0` – `1.5.0`) have been organized into **[CHANGELOG.md](CHANGELOG.md)**.
 
 ## Screenshots
 
@@ -51,7 +51,7 @@ Captured from the `1.4.0` emulator test suite using sample recipe data:
 
 ## Installation & Data Safety
 
-- Download from [GitHub Releases](https://github.com/vanvan-program/cove-recipe/releases) or build `app/build/outputs/apk/debug/app-debug.apk` (also copied to `dist/CoveRecipe-1.4.0.apk` by the PowerShell script).
+- Download from [GitHub Releases](https://github.com/vanvan-program/cove-recipe/releases) or build `app/build/outputs/apk/debug/app-debug.apk` (also copied to `dist/CoveRecipe-1.5.0.apk` by the PowerShell script).
 - Package name: `cn.myrecipe.app`. Upgrade in place with the same signing key without uninstalling; always export a ZIP backup first (Android cloud backup and device transfer are disabled).
 - Grant **Notifications** and **Exact Alarms** for reliable background cooking timers. Exported ZIP backups are unencrypted—store them safely.
 

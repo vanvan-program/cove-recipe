@@ -37,7 +37,9 @@ class LocalRepository(val db: RecipeDatabase, val gate: Mutex) : RecipeRepositor
         full.steps.forEach { require(it.content.isNotBlank()) { "步骤正文不能为空" }; require(it.heat in listOf("未指定", "大火", "中火", "小火")) { "火候无效" }; require(it.timerSeconds == null || it.timerSeconds in 1..604800) { "步骤计时须在 1 秒至 7 天之间" } }
         db.withTransaction {
             val existing = dao.recipes()
-            val order = existing.find { it.recipe.id == full.recipe.id }?.recipe?.sortOrder
+            val current = existing.find { it.recipe.id == full.recipe.id }?.recipe
+            require(current?.deletedAt == null) { "菜谱已移入回收站" }
+            val order = current?.sortOrder
                 ?: ((existing.minOfOrNull { it.recipe.sortOrder } ?: 1) - 1)
             dao.putRecipe(full.recipe.copy(name = full.recipe.name.trim(), sortOrder = order, updatedAt = System.currentTimeMillis()))
             dao.deleteIngredients(full.recipe.id); dao.deleteSteps(full.recipe.id); dao.deleteLinks(full.recipe.id)

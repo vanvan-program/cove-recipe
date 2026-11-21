@@ -19,10 +19,10 @@
 
 ## 项目定位
 
-**Cove Recipe** 是一款完全离线、本地优先的 Android 个人菜谱本（最低支持 Android 8 / API 26，目标 SDK 为 Android 16 / API 36）。专注记录与烹饪体验本身：**无账号、无网络权限、无广告、无云端同步**。
+**Cove Recipe** 是一款菜谱离线可用、本地优先的 Android 个人菜谱本（最低支持 Android 8 / API 26，目标 SDK 为 Android 16 / API 36）。专注记录与烹饪体验本身：**无账号、无广告、无云端同步。联网用于你手动发起的版本检查和安装包下载**。
 
 > [!TIP]
-> 1.1.0 ～ 1.4.0 的逐版本更新说明已整理至 **[CHANGELOG.md](CHANGELOG.md)**。
+> 1.1.0 ～ 1.5.0 的逐版本更新说明已整理至 **[CHANGELOG.md](CHANGELOG.md)**。
 
 ## 界面示例
 
@@ -51,7 +51,7 @@
 
 ## 安装与数据安全
 
-- 可从 [GitHub Releases](https://github.com/vanvan-program/cove-recipe/releases) 下载发布包，或自行构建 `app/build/outputs/apk/debug/app-debug.apk`（PowerShell 脚本另复制为 `dist/CoveRecipe-1.4.0.apk`）。
+- 可从 [GitHub Releases](https://github.com/vanvan-program/cove-recipe/releases) 下载发布包，或自行构建 `app/build/outputs/apk/debug/app-debug.apk`（PowerShell 脚本另复制为 `dist/CoveRecipe-1.5.0.apk`）。
 - 应用包名为 `cn.myrecipe.app`。升级请**直接覆盖安装**并保持同一签名，切勿先卸载；不同电脑生成的 debug 签名不同，换包或卸载前请务必在设置中导出 ZIP 备份（系统云备份与设备迁移均已关闭）。
 - 首次使用计时器需授予「通知」与「精确闹钟」权限；锁屏与常规切后台可持续计时，手机重启后进行中的计时会标记为中断且不补响。
 - 导出的 ZIP 备份未加密，请妥善保存在信任的位置。
