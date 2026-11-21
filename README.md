@@ -32,13 +32,15 @@ Cove Recipe 是一款中文 Android 个人菜谱本，支持 Android 8.0（API 2
 
 ## 界面示例
 
-1.4.0 的界面截图，使用模拟器中的示例菜谱。
+以下截图取自已发布的 v1.5.0 APK，在 Android 15 模拟器上使用示例菜谱拍摄。
 
-<p>
-  <img src="docs/screenshots/140-home.png" width="230" alt="菜谱首页" />
-  <img src="docs/screenshots/140-detail-seasonings.png" width="230" alt="菜谱详情与调料备注" />
-  <img src="docs/screenshots/140-shopping-sources.png" width="230" alt="购物清单与来源菜谱" />
-</p>
+| 菜谱首页 | 菜谱详情 | 购物清单 |
+| :---: | :---: | :---: |
+| <a href="docs/screenshots/150-home.png"><img src="docs/screenshots/150-home.png" width="230" alt="置顶菜谱与准备、烹饪时间" /></a> | <a href="docs/screenshots/150-detail.png"><img src="docs/screenshots/150-detail.png" width="230" alt="番茄炒蛋的食材和备菜说明" /></a> | <a href="docs/screenshots/150-shopping.png"><img src="docs/screenshots/150-shopping.png" width="230" alt="购物项及其来源菜谱" /></a> |
+
+| 排序菜单 | 回收站 | 关于版本与下载源 |
+| :---: | :---: | :---: |
+| <a href="docs/screenshots/150-sort.png"><img src="docs/screenshots/150-sort.png" width="230" alt="首页可选的菜谱排序方式" /></a> | <a href="docs/screenshots/150-trash.png"><img src="docs/screenshots/150-trash.png" width="230" alt="回收站内的菜谱及恢复按钮" /></a> | <a href="docs/screenshots/150-about.png"><img src="docs/screenshots/150-about.png" width="230" alt="已安装版本 v1.5.0 和下载源设置" /></a> |
 
 ## 核心功能
 

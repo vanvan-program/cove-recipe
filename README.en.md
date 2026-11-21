@@ -32,13 +32,15 @@ Cove Recipe is a Chinese-language personal cookbook for Android 8.0 (API 26) and
 
 ## Screenshots
 
-These v1.4.0 screenshots show sample recipes on an emulator.
+Captured from the published v1.5.0 APK on an Android 15 emulator using sample recipes.
 
-<p>
-  <img src="docs/screenshots/140-home.png" width="230" alt="Recipe Home" />
-  <img src="docs/screenshots/140-detail-seasonings.png" width="230" alt="Recipe Detail & Seasonings" />
-  <img src="docs/screenshots/140-shopping-sources.png" width="230" alt="Shopping List with Recipe Sources" />
-</p>
+| Recipe list | Recipe details | Shopping list |
+| :---: | :---: | :---: |
+| <a href="docs/screenshots/150-home.png"><img src="docs/screenshots/150-home.png" width="230" alt="Pinned recipes with preparation and cooking times" /></a> | <a href="docs/screenshots/150-detail.png"><img src="docs/screenshots/150-detail.png" width="230" alt="Tomato and egg stir-fry with its ingredients and preparation notes" /></a> | <a href="docs/screenshots/150-shopping.png"><img src="docs/screenshots/150-shopping.png" width="230" alt="Shopping items and the recipes they came from" /></a> |
+
+| Sort menu | Recycle bin | Version and downloads |
+| :---: | :---: | :---: |
+| <a href="docs/screenshots/150-sort.png"><img src="docs/screenshots/150-sort.png" width="230" alt="Sort options on the recipe list" /></a> | <a href="docs/screenshots/150-trash.png"><img src="docs/screenshots/150-trash.png" width="230" alt="Deleted recipes and their restore buttons" /></a> | <a href="docs/screenshots/150-about.png"><img src="docs/screenshots/150-about.png" width="230" alt="Installed version v1.5.0 and download source settings" /></a> |
 
 ## Key Features
 

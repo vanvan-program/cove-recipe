@@ -32,13 +32,15 @@ Cove Recipe 是一款中文 Android 個人食譜本，支援 Android 8.0（API 2
 
 ## 介面預覽
 
-以下為 1.4.0 的介面截圖，使用模擬器中的範例食譜。
+以下畫面取自已發布的 v1.5.0 APK，在 Android 15 模擬器上以範例食譜擷取。
 
-<p>
-  <img src="docs/screenshots/140-home.png" width="230" alt="食譜首頁" />
-  <img src="docs/screenshots/140-detail-seasonings.png" width="230" alt="食譜詳情與調味備註" />
-  <img src="docs/screenshots/140-shopping-sources.png" width="230" alt="採買清單與來源食譜" />
-</p>
+| 食譜首頁 | 食譜詳情 | 採買清單 |
+| :---: | :---: | :---: |
+| <a href="docs/screenshots/150-home.png"><img src="docs/screenshots/150-home.png" width="230" alt="置頂食譜與備料、烹調時間" /></a> | <a href="docs/screenshots/150-detail.png"><img src="docs/screenshots/150-detail.png" width="230" alt="番茄炒蛋的食材與備料說明" /></a> | <a href="docs/screenshots/150-shopping.png"><img src="docs/screenshots/150-shopping.png" width="230" alt="採買項目及其來源食譜" /></a> |
+
+| 排序選單 | 資源回收筒 | 關於版本與下載來源 |
+| :---: | :---: | :---: |
+| <a href="docs/screenshots/150-sort.png"><img src="docs/screenshots/150-sort.png" width="230" alt="首頁可選的食譜排序方式" /></a> | <a href="docs/screenshots/150-trash.png"><img src="docs/screenshots/150-trash.png" width="230" alt="資源回收筒中的食譜與還原按鈕" /></a> | <a href="docs/screenshots/150-about.png"><img src="docs/screenshots/150-about.png" width="230" alt="已安裝的 v1.5.0 與下載來源設定" /></a> |
 
 ## 核心功能
 
