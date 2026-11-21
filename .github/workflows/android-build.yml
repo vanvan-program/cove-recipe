@@ -25,7 +25,7 @@ jobs:
           $null = [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path 'scripts/Sign-CoveRecipe.ps1'), [ref]$tokens, [ref]$errors)
           if ($errors.Count) { throw ($errors -join [Environment]::NewLine) }
       - name: Assemble and test
-        run: bash gradlew :app:assembleRelease :app:testDebugUnitTest :app:assembleDebugAndroidTest :app:lintDebug --console=plain --max-workers=2
+        run: bash gradlew :app:assembleRelease :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug --console=plain --max-workers=2
       - name: Verify unsigned APK and prepare signing kit
         run: |
           set -euo pipefail
@@ -50,24 +50,15 @@ jobs:
           if-no-files-found: error
           compression-level: 0
       - name: Enable emulator acceleration
-        run: sudo setfacl -m "u:$(id -un):rw" /dev/kvm
+        run: |
+          bash gradlew --stop
+          sudo setfacl -m "u:$(id -un):rw" /dev/kvm
       - name: Test upgrades, recycle bin and version screen on Android 15
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
           arch: x86_64
           target: google_apis
+          profile: pixel_6
           disable-animations: true
-          script: bash gradlew :app:connectedDebugAndroidTest '-Pandroid.testInstrumentationRunnerArguments.class=cn.myrecipe.app.MigrationDeviceTest,cn.myrecipe.app.RepositoryDeviceTest#recipeSaveEditDeleteCascades,cn.myrecipe.app.RepositoryDeviceTest#trashBackupRetainsIngredientsAndStepsAfterRestore,cn.myrecipe.app.UiDeviceTest#settingsShowsInstalledVersionAndUpdateControls' --max-workers=2 --console=plain
-      - name: Show device test failures
-        if: failure()
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import xml.etree.ElementTree as ET
-          for file in Path("app/build/outputs/androidTest-results").rglob("*.xml"):
-              for case in ET.parse(file).iter("testcase"):
-                  failure = case.find("failure")
-                  if failure is not None:
-                      print(case.get("name"), (failure.text or "")[:5000])
-          PY
+          script: bash scripts/test-release-device.sh
