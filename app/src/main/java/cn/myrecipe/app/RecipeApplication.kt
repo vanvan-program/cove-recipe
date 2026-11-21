@@ -13,7 +13,7 @@ import kotlinx.coroutines.sync.Mutex
 
 class AppContainer(context: Context) {
     val gate = Mutex()
-    val db = Room.databaseBuilder(context, RecipeDatabase::class.java, "my-recipe.db").addMigrations(RecipeDatabase.MIGRATION_1_2, RecipeDatabase.MIGRATION_2_3).build()
+    val db = Room.databaseBuilder(context, RecipeDatabase::class.java, "my-recipe.db").addMigrations(RecipeDatabase.MIGRATION_1_2, RecipeDatabase.MIGRATION_2_3, RecipeDatabase.MIGRATION_3_4).build()
     val repository = LocalRepository(db, gate)
     val images = ImageStore(context)
     val preferences = Preferences(context)

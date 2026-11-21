@@ -8,7 +8,7 @@ fun newId(): String = UUID.randomUUID().toString()
 fun normalizeName(value: String): String = Normalizer.normalize(value.trim(), Normalizer.Form.NFKC)
 
 @Entity(tableName = "recipes", foreignKeys = [ForeignKey(entity = Category::class, parentColumns = ["id"], childColumns = ["categoryId"], onDelete = ForeignKey.SET_NULL)], indices = [Index("categoryId")])
-data class Recipe(@PrimaryKey val id: String = newId(), val name: String, val description: String = "", val coverPath: String? = null, val categoryId: String? = null, val prepareMinutes: Int? = null, val cookMinutes: Int? = null, val favorite: Boolean = false, val pinned: Boolean = false, val lastUsedAt: Long? = null, val createdAt: Long = System.currentTimeMillis(), val updatedAt: Long = System.currentTimeMillis(), @ColumnInfo(defaultValue = "''") val preparation: String = "", @ColumnInfo(defaultValue = "0") val sortOrder: Int = 0)
+data class Recipe(@PrimaryKey val id: String = newId(), val name: String, val description: String = "", val coverPath: String? = null, val categoryId: String? = null, val prepareMinutes: Int? = null, val cookMinutes: Int? = null, val favorite: Boolean = false, val pinned: Boolean = false, val lastUsedAt: Long? = null, val createdAt: Long = System.currentTimeMillis(), val updatedAt: Long = System.currentTimeMillis(), @ColumnInfo(defaultValue = "''") val preparation: String = "", @ColumnInfo(defaultValue = "0") val sortOrder: Int = 0, val deletedAt: Long? = null)
 
 @Entity(tableName = "ingredients", foreignKeys = [ForeignKey(entity = Recipe::class, parentColumns = ["id"], childColumns = ["recipeId"], onDelete = ForeignKey.CASCADE)], indices = [Index("recipeId")])
 data class RecipeIngredient(@PrimaryKey val id: String = newId(), val recipeId: String, val name: String = "", val amount: String = "", val unit: String = "", val amountNote: String = "", val sortOrder: Int = 0, @ColumnInfo(defaultValue = "0") val isSeasoning: Boolean = false)
@@ -38,7 +38,7 @@ class ShoppingSourcesConverter {
     @TypeConverter fun encode(names: List<String>): String = org.json.JSONArray(names).toString()
     @TypeConverter fun decode(json: String): List<String> = org.json.JSONArray(json).let { array -> (0 until array.length()).map { array.getString(it) } }
 }
-data class AppSnapshot(val recipes: List<RecipeFull> = emptyList(), val categories: List<Category> = emptyList(), val tags: List<Tag> = emptyList(), val shopping: List<ShoppingItem> = emptyList(), val timer: ActiveTimer? = null)
+data class AppSnapshot(val recipes: List<RecipeFull> = emptyList(), val categories: List<Category> = emptyList(), val tags: List<Tag> = emptyList(), val shopping: List<ShoppingItem> = emptyList(), val timer: ActiveTimer? = null, val trash: List<RecipeFull> = emptyList())
 
 fun categoryPath(id: String?, categories: List<Category>): String {
     val parts = mutableListOf<String>(); var current = id; val seen = mutableSetOf<String>()
@@ -62,13 +62,22 @@ fun validateCategories(categories: List<Category>) {
         }
     }
 }
-fun filterRecipes(snapshot: AppSnapshot, query: String, mode: String, categoryId: String?): List<RecipeFull> {
+enum class RecipeSort(val title: String) { MANUAL("自定义"), CREATED("添加时间"), UPDATED("修改时间"), NAME("名称"), COOK("烹饪时长") }
+fun filterRecipes(snapshot: AppSnapshot, query: String, mode: String, categoryId: String?, sort: RecipeSort = RecipeSort.MANUAL, descending: Boolean = false): List<RecipeFull> {
     val words = normalizeName(query).split(Regex("\\s+")).filter { it.isNotBlank() }
     val allowed = categoryId?.let { categoryDescendants(it, snapshot.categories) }
+    val comparator: Comparator<RecipeFull> = when (sort) {
+        RecipeSort.MANUAL -> compareByDescending<RecipeFull> { it.recipe.pinned }.thenBy { it.recipe.sortOrder }.thenByDescending { if (mode == "最近使用") it.recipe.lastUsedAt else it.recipe.updatedAt }
+        RecipeSort.CREATED -> compareBy { it.recipe.createdAt }
+        RecipeSort.UPDATED -> compareBy { it.recipe.updatedAt }
+        RecipeSort.NAME -> java.text.Collator.getInstance(java.util.Locale.SIMPLIFIED_CHINESE).let { collator -> Comparator { a, b -> collator.compare(a.recipe.name, b.recipe.name) } }
+        RecipeSort.COOK -> compareBy { it.recipe.cookMinutes }
+    }
+    val order = if (sort != RecipeSort.MANUAL && descending) comparator.reversed() else comparator
     return snapshot.recipes.filter { full ->
         (mode != "收藏" || full.recipe.favorite) && (mode != "最近使用" || full.recipe.lastUsedAt != null) &&
         (allowed == null || full.recipe.categoryId in allowed) && words.all { word ->
             (listOf(full.recipe.name, categoryPath(full.recipe.categoryId, snapshot.categories)) + full.ingredients.map { it.name } + full.tags.map { it.name }).any { normalizeName(it).contains(word, ignoreCase = true) }
         }
-    }.sortedWith(compareByDescending<RecipeFull> { it.recipe.pinned }.thenBy { it.recipe.sortOrder }.thenByDescending { if (mode == "最近使用") it.recipe.lastUsedAt else it.recipe.updatedAt })
+    }.sortedWith(order.thenBy { it.recipe.id })
 }

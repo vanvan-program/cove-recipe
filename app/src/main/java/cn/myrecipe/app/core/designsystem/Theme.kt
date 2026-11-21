@@ -10,7 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private val WarmColors = lightColorScheme(primary = Color(0xFFA84E28), onPrimary = Color.White, primaryContainer = Color(0xFFFFDCC6), onPrimaryContainer = Color(0xFF3B1808), secondary = Color(0xFF5B7050), secondaryContainer = Color(0xFFE0EBD8), background = Color(0xFFFFFAF3), surface = Color(0xFFFFFAF3), surfaceVariant = Color(0xFFF1E5D7), surfaceContainer = Color(0xFFF6EDE2), surfaceContainerLow = Color(0xFFFBF3E9), surfaceContainerHigh = Color(0xFFF1E5D7), surfaceContainerHighest = Color(0xFFEBDCCD), surfaceContainerLowest = Color(0xFFFFFCF7), onSurface = Color(0xFF302820), onSurfaceVariant = Color(0xFF706154), outline = Color(0xFF958679))
+private val WarmColors = lightColorScheme(primary = Color(0xFF70432B), onPrimary = Color.White, primaryContainer = Color(0xFFEEDABB), onPrimaryContainer = Color(0xFF3B1808), secondary = Color(0xFF795D42), secondaryContainer = Color(0xFFE4D4B9), background = Color(0xFFF8EFDC), surface = Color(0xFFF8EFDC), surfaceVariant = Color(0xFFEBDDC3), surfaceContainer = Color(0xFFF6EDE2), surfaceContainerLow = Color(0xFFF3E8D3), surfaceContainerHigh = Color(0xFFEBDDC3), surfaceContainerHighest = Color(0xFFEBDCCD), surfaceContainerLowest = Color(0xFFFFF9EC), onSurface = Color(0xFF302820), onSurfaceVariant = Color(0xFF706154), outline = Color(0xFF958679))
 private val KitchenType = Typography(
     headlineLarge = TextStyle(fontFamily = FontFamily.Serif, fontWeight = FontWeight.SemiBold, fontSize = 32.sp, lineHeight = 40.sp),
     headlineMedium = TextStyle(fontFamily = FontFamily.Serif, fontWeight = FontWeight.SemiBold, fontSize = 28.sp, lineHeight = 36.sp),

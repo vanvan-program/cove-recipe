@@ -20,7 +20,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import java.time.LocalDate
 
-@Composable fun SettingsScreen(vm: AppViewModel, onTaxonomy: () -> Unit, onRestored: () -> Unit) {
+@Composable fun SettingsScreen(vm: AppViewModel, onTaxonomy: () -> Unit, onRestored: () -> Unit, onVersion: () -> Unit, onTrash: () -> Unit) {
     val context = LocalContext.current; val lifecycle = LocalLifecycleOwner.current
     var pendingRestore by remember { mutableStateOf<Uri?>(null) }; var reminderStatus by remember { mutableStateOf(vm.container.timer.permissionMessage()) }
     DisposableEffect(lifecycle) { val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME) reminderStatus = vm.container.timer.permissionMessage() }; lifecycle.lifecycle.addObserver(observer); onDispose { lifecycle.lifecycle.removeObserver(observer) } }
@@ -31,7 +31,8 @@ import java.time.LocalDate
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Section("整理菜谱")
             OutlinedButton(onClick = onTaxonomy, modifier = Modifier.fillMaxWidth()) { Text("分类与标签管理") }
-            Section("数据属于你")
+            OutlinedButton(onClick = onTrash, modifier = Modifier.fillMaxWidth()) { Text("回收站") }
+            Section("导出与备份")
             Text("菜谱、图片和购物清单只保存在本机。导出 ZIP 后可自行保管或迁移；卸载应用会删除本机数据，请先备份。")
             Button(onClick = { export.launch("CoveRecipe-${LocalDate.now()}.zip") }, enabled = !vm.busy, modifier = Modifier.fillMaxWidth()) { Text("导出完整备份") }
             OutlinedButton(onClick = { restore.launch(arrayOf("application/zip", "application/octet-stream", "application/x-zip-compressed")) }, enabled = !vm.busy, modifier = Modifier.fillMaxWidth()) { Text("从备份恢复") }
@@ -42,7 +43,7 @@ import java.time.LocalDate
             OutlinedButton(onClick = { context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)) }, modifier = Modifier.fillMaxWidth()) { Text("通知设置") }
             Text("锁屏和切后台继续计时；重启手机后旧计时中断。系统强行停止 App 后不保证提醒。", style = MaterialTheme.typography.bodySmall)
             Section("关于")
-            Text("Cove Recipe · 1.4.0")
+            OutlinedButton(onClick = onVersion, modifier = Modifier.fillMaxWidth()) { Text("关于版本") }
             Text("自己的家庭菜谱本\n离线 · 无账号 · 无广告", color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }

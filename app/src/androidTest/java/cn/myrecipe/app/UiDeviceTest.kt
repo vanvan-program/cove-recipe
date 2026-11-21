@@ -27,7 +27,7 @@ class UiDeviceTest {
     @Test fun createRecipeThroughEditor() {
         compose.onNodeWithTag("newRecipe").performClick()
         compose.onNodeWithText("菜名（必填）").performTextInput("青椒土豆丝")
-        compose.onNodeWithText("保存", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("保存菜谱", useUnmergedTree = true).performClick()
         compose.waitUntil(5000) { compose.onAllNodesWithText("青椒土豆丝").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithText("青椒土豆丝").assertIsDisplayed()
         assertEquals("青椒土豆丝", runBlocking { container.db.dao().recipes().single().recipe.name })
@@ -128,7 +128,7 @@ class UiDeviceTest {
         compose.onNodeWithText("分类：家常菜").assertExists()
         compose.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("备菜说明"))
         compose.onNodeWithText("备菜说明").performTextInput("番茄切块，鸡蛋打散。")
-        compose.onNodeWithText("保存", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("保存菜谱", useUnmergedTree = true).performClick()
         compose.waitUntil(5000) { runBlocking { container.db.dao().recipes().any { it.recipe.name == "备菜测试" } } }
         val stored = runBlocking { container.db.dao().recipes().single() }
         assertEquals("番茄切块，鸡蛋打散。", stored.recipe.preparation)
@@ -186,7 +186,7 @@ class UiDeviceTest {
         compose.onNodeWithText("＋ 添加食材").performClick()
         compose.waitUntil(5000) { compose.onAllNodesWithText("食材名称").fetchSemanticsNodes().any { it.config.getOrElse(androidx.compose.ui.semantics.SemanticsProperties.Focused) { false } } }
         compose.onNodeWithText("食材名称").assertIsFocused().performTextInput("蒜")
-        compose.onNodeWithText("保存", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("保存菜谱", useUnmergedTree = true).performClick()
         compose.waitUntil(5000) { runBlocking { container.db.dao().recipes().any { it.recipe.name == "自动聚焦测试" } } }
         assertEquals("蒜", runBlocking { container.db.dao().recipes().single().ingredients.single().name })
     }
@@ -231,7 +231,7 @@ class UiDeviceTest {
         compose.waitUntil(5000) { compose.onAllNodesWithText("调料名称").fetchSemanticsNodes().any { it.config.getOrElse(androidx.compose.ui.semantics.SemanticsProperties.Focused) { false } } }
         compose.onNodeWithText("调料名称").performTextInput("蚝油")
         compose.onNodeWithText("数量").performTextInput("2"); compose.onNodeWithText("单位（可自定义）").performTextInput("勺")
-        compose.onNodeWithText("保存", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("保存菜谱", useUnmergedTree = true).performClick()
         compose.waitUntil(5000) { runBlocking { container.db.dao().recipes().any { it.recipe.name == "调料测试" } } }
         val full = runBlocking { container.db.dao().recipes().single() }; assertTrue(full.foodIngredients.isEmpty()); assertEquals("蚝油", full.seasonings.single().name)
         compose.onNodeWithText("调料测试").performClick()

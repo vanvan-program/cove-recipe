@@ -43,7 +43,12 @@ class RepositoryDeviceTest {
     @Test fun recipeSaveEditDeleteCascades() = runBlocking {
         val full = recipe(); val edited = full.copy(recipe = full.recipe.copy(name = "家常红烧肉"), ingredients = emptyList(), steps = emptyList(), tags = emptyList()); repo.save(edited)
         assertEquals("家常红烧肉", db.dao().recipes().single().recipe.name); assertTrue(db.dao().recipes().single().ingredients.isEmpty())
-        repo.delete(full.recipe.id); assertTrue(db.dao().recipes().isEmpty()); assertTrue(db.dao().links().isEmpty())
+        repo.delete(full.recipe.id)
+        assertNotNull(db.dao().recipes().single().recipe.deletedAt)
+        repo.restoreRecipe(full.recipe.id)
+        assertEquals(full.ingredients.map { it.id }.toSet(), db.dao().recipes().single().ingredients.map { it.id }.toSet())
+        repo.delete(full.recipe.id); repo.purgeRecipe(full.recipe.id)
+        assertTrue(db.dao().recipes().isEmpty()); assertTrue(db.dao().links().isEmpty())
     }
     @Test fun failedRecipeSavePreservesPreviousChildren() = runBlocking {
         val full = recipe(); rejects { repo.save(full.copy(recipe = full.recipe.copy(name = ""), ingredients = emptyList())) }; assertEquals("五花肉", db.dao().recipes().single().ingredients.single().name)

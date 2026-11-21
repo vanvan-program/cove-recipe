@@ -47,7 +47,7 @@ import cn.myrecipe.app.core.database.*
     }
     editing?.let { item -> AlertDialog(onDismissRequest = { editing = null }, title = { Text(if (item.name.isBlank()) "添加食材" else "编辑食材") }, text = { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) { IngredientNameField(name, autofocus = item.name.isBlank()) { name = it }; Field(note, "采购备注（可选）", singleLine = false) { note = it } } }, confirmButton = { TextButton(onClick = { vm.run(success = { editing = null }) { vm.container.repository.saveItem(item.copy(name = name, note = note)) } }) { Text("保存") } }, dismissButton = { TextButton(onClick = { editing = null }) { Text("取消") } }) }
     if (clearing) Confirm("清空购物清单", "删除全部待买和已买食材及采购备注？", { clearing = false }) { clearing = false; vm.run { vm.container.repository.clearShopping(false) } }
-    if (addingRecipes) ChoiceSheet("选择菜谱", snapshot.recipes.map { it.recipe.id to it.recipe.name }, emptySet(), { addingRecipes = false }) { ids -> pickingIngredients = snapshot.recipes.filter { it.recipe.id in ids }.flatMap { it.ingredients }; addingRecipes = false }
+    if (addingRecipes) ChoiceSheet("选择菜谱", snapshot.recipes.sortedByDescending { it.recipe.favorite }.map { it.recipe.id to it.recipe.name }, emptySet(), { addingRecipes = false }) { ids -> pickingIngredients = snapshot.recipes.filter { it.recipe.id in ids }.flatMap { it.ingredients }; addingRecipes = false }
     pickingIngredients?.let { ingredients -> RecipeShoppingSheet(vm, ingredients, { pickingIngredients = null }) { pickingIngredients = null } }
 }
 @Composable private fun ShoppingRow(item: ShoppingItem, toggle: () -> Unit, edit: () -> Unit, delete: () -> Unit) {

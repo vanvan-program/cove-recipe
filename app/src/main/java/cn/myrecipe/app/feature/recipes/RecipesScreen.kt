@@ -31,13 +31,36 @@ import cn.myrecipe.app.core.database.*
     var selected by remember { mutableStateOf<Set<String>>(emptySet()) }
     var selecting by rememberSaveable { mutableStateOf(false) }
     var ingredientsSheet by remember { mutableStateOf<List<RecipeIngredient>?>(null) }
-    val recipes = filterRecipes(snapshot, query, mode, category)
+    val sort by vm.container.preferences.sort.collectAsStateWithLifecycle(initialValue = RecipeSort.MANUAL to false)
+    var sortMenu by remember { mutableStateOf(false) }
+    val recipes = filterRecipes(snapshot, query, mode, category, sort.first, sort.second)
+    val draggable = sort.first == RecipeSort.MANUAL && !selecting
     val saveOrder: (List<String>) -> Unit = { ids -> vm.run(onError = { vm.notify(it) }) { vm.container.repository.reorderRecipes(ids) } }
-    val (drag, dragModifier) = rememberRecipeDragState(recipes, !selecting, saveOrder)
-    val orderedRecipes = drag.ids.mapNotNull { id -> recipes.find { it.recipe.id == id } }.let { ordered -> ordered + recipes.filter { full -> ordered.none { it.recipe.id == full.recipe.id } } }
+    val (drag, dragModifier) = rememberRecipeDragState(recipes, draggable, saveOrder)
+    val orderedRecipes = if (!draggable) recipes else drag.ids.mapNotNull { id -> recipes.find { it.recipe.id == id } }.let { ordered -> ordered + recipes.filter { full -> ordered.none { it.recipe.id == full.recipe.id } } }
     Box(Modifier.fillMaxSize()) {
     Column(Modifier.fillMaxSize()) {
         PageTitle("我的菜谱") {
+            Box {
+                TextButton(onClick = { sortMenu = true }) { Text("排序") }
+                DropdownMenu(expanded = sortMenu, onDismissRequest = { sortMenu = false }) {
+                    RecipeSort.entries.forEach { option ->
+                        DropdownMenuItem(text = { Text((if (sort.first == option) "✓ " else "") + option.title) }, onClick = {
+                            sortMenu = false
+                            vm.run { vm.container.preferences.saveSort(option, sort.second) }
+                        })
+                    }
+                    if (sort.first != RecipeSort.MANUAL) {
+                        HorizontalDivider()
+                        listOf(false to "正序", true to "倒序").forEach { (desc, label) ->
+                            DropdownMenuItem(text = { Text((if (sort.second == desc) "✓ " else "") + label) }, onClick = {
+                                sortMenu = false
+                                vm.run { vm.container.preferences.saveSort(sort.first, desc) }
+                            })
+                        }
+                    }
+                }
+            }
             IconButton(onClick = { selecting = !selecting; selected = emptySet() }, modifier = Modifier.testTag("multiSelect")) {
                 Icon(if (selecting) Icons.Outlined.Close else Icons.Outlined.CheckCircle, if (selecting) "取消多选" else "多选", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
             }
@@ -51,11 +74,9 @@ import cn.myrecipe.app.core.database.*
         LazyColumn(Modifier.weight(1f).then(dragModifier).testTag("recipeList"), state = drag.listState, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 196.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (recipes.isEmpty()) item { EmptyState(if (snapshot.recipes.isEmpty()) "自己的菜谱，从第一道开始" else "没有找到菜谱", if (snapshot.recipes.isEmpty()) "点右下角新建，记下家里的拿手菜。" else "试试其他关键词或分类。") }
             items(orderedRecipes, key = { it.recipe.id }) { full ->
-                Card(onClick = { if (selecting) selected = if (full.recipe.id in selected) selected - full.recipe.id else selected + full.recipe.id else onOpen(full.recipe.id) }, modifier = Modifier.fillMaxWidth().testTag("recipe-${full.recipe.id}").then(if (selecting) Modifier else Modifier.recipeDragItem(drag, full.recipe.id, recipes, saveOrder)), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest), border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant), shape = RoundedCornerShape(20.dp)) {
-                    if (full.recipe.coverPath != null && full.recipe.pinned && !selecting) Cover(full.recipe.coverPath, vm.container.images, Modifier.fillMaxWidth().height(154.dp))
+                Card(onClick = { if (selecting) selected = if (full.recipe.id in selected) selected - full.recipe.id else selected + full.recipe.id else onOpen(full.recipe.id) }, modifier = Modifier.fillMaxWidth().testTag("recipe-${full.recipe.id}").then(if (!draggable) Modifier else Modifier.recipeDragItem(drag, full.recipe.id, recipes, saveOrder)), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest), border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant), shape = RoundedCornerShape(20.dp)) {
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         if (selecting) Checkbox(full.recipe.id in selected, null)
-                        if (full.recipe.coverPath != null && (!full.recipe.pinned || selecting)) Cover(full.recipe.coverPath, vm.container.images, Modifier.size(84.dp))
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                             Text(full.recipe.name + if (full.recipe.pinned) " · 置顶" else "", style = MaterialTheme.typography.titleMedium)
                             Text(categoryPath(full.recipe.categoryId, snapshot.categories), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -118,6 +139,6 @@ import cn.myrecipe.app.core.database.*
         }
         Button(onClick = onKitchen, modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).heightIn(min = 52.dp)) { Text("开始做饭") }
     }
-    if (deleting) Confirm("删除菜谱", "删除“${r.name}”及其食材和步骤？购物清单不受影响。", { deleting = false }) { deleting = false; vm.run(onBack) { vm.container.repository.delete(r.id) } }
+    if (deleting) Confirm("删除菜谱", "将“${r.name}”移入回收站？可以在设置中恢复。", { deleting = false }) { deleting = false; vm.run(onBack) { vm.container.repository.delete(r.id) } }
     if (shopping) RecipeShoppingSheet(vm, full.ingredients, { shopping = false }) { shopping = false }
 }

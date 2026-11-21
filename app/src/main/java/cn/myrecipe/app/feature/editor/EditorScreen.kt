@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     var focusIngredient by remember { mutableStateOf<String?>(null) }
+    var timingStep by remember { mutableStateOf<String?>(null) }
     var exiting by remember { mutableStateOf(false) }; var categories by remember { mutableStateOf(false) }; var tags by remember { mutableStateOf(false) }
     var newCategory by remember { mutableStateOf<Category?>(null) }
     var newTag by remember { mutableStateOf(false) }; var tagName by remember { mutableStateOf("") }
@@ -26,8 +27,8 @@ import kotlinx.coroutines.launch
     fun back() { if (vm.busy) return; if (draft.dirty) exiting = true else onBack() }
     BackHandler { back() }
     Column {
-        PageTitle(if (draft.original.recipe.name.isEmpty()) "新建菜谱" else "编辑菜谱", { back() }) { TextButton(onClick = { vm.saveEditor(onBack) }, enabled = !vm.busy) { Text("保存") } }
-        LazyColumn(state = listState, contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        PageTitle(if (draft.original.recipe.name.isEmpty()) "新建菜谱" else "编辑菜谱", { back() })
+        LazyColumn(modifier = Modifier.weight(1f), state = listState, contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item { Field(draft.name, "菜名（必填）") { draft.name = it } }
             if (draft.coverPath != null) item { Cover(draft.coverPath, vm.container.images, Modifier.fillMaxWidth().height(160.dp)) }
             item { Row { OutlinedButton(onClick = { photo.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) { Text("选择封面") }; if (draft.coverPath != null) TextButton(onClick = { draft.coverPath = null }) { Text("移除封面") } } }
@@ -84,14 +85,21 @@ import kotlinx.coroutines.launch
                     Row { Text("步骤 ${index + 1}", Modifier.weight(1f)); ReorderButtons(index, draft.steps.size, { swap(draft.steps, index, index - 1) }, { swap(draft.steps, index, index + 1) }, { draft.steps.removeAt(index) }) }
                     Field(step.content, "步骤说明", singleLine = false) { draft.steps[index] = step.copy(content = it) }
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) { listOf("未指定", "大火", "中火", "小火").forEach { heat -> FilterChip(step.heat == heat, { draft.steps[index] = step.copy(heat = heat) }, { Text(heat) }) } }
-                    Field(step.timerSeconds?.toString().orEmpty(), "参考计时（秒，可留空）", numeric = true) { value ->
-                        if (value.isBlank()) draft.steps[index] = step.copy(timerSeconds = null)
-                        else value.toLongOrNull()?.let { draft.steps[index] = step.copy(timerSeconds = it) }
+                    Row {
+                        OutlinedButton(onClick = { timingStep = step.id }) { Text(step.timerSeconds?.let { "参考计时 " + formatTime(it * 1000) } ?: "设置步骤计时") }
+                        if (step.timerSeconds != null) TextButton(onClick = { draft.steps[index] = step.copy(timerSeconds = null) }) { Text("清除时长") }
                     }
                 } }
             }
             item { OutlinedButton(onClick = { draft.steps.add(RecipeStep(recipeId = draft.original.recipe.id)) }, modifier = Modifier.fillMaxWidth()) { Text("＋ 添加步骤") } }
-            item { Button(onClick = { vm.saveEditor(onBack) }, enabled = !vm.busy, modifier = Modifier.fillMaxWidth()) { Text("保存菜谱") } }
+        }
+        Button(onClick = { vm.saveEditor(onBack) }, enabled = !vm.busy, modifier = Modifier.align(androidx.compose.ui.Alignment.End).padding(end = 16.dp, bottom = 8.dp)) { Text("保存菜谱") }
+    }
+    draft.steps.find { it.id == timingStep }?.let { step ->
+        TimeSheet(step.timerSeconds ?: 60L, { timingStep = null }) { seconds ->
+            val index = draft.steps.indexOfFirst { it.id == step.id }
+            if (index >= 0) draft.steps[index] = draft.steps[index].copy(timerSeconds = seconds)
+            timingStep = null
         }
     }
     if (exiting) AlertDialog(onDismissRequest = { exiting = false }, title = { Text("保存修改？") }, text = { Text("还有未保存的内容。") }, confirmButton = { TextButton(onClick = { exiting = false; vm.saveEditor(onBack) }) { Text("保存并返回") } }, dismissButton = { Row { TextButton(onClick = { exiting = false }) { Text("继续编辑") }; TextButton(onClick = onBack) { Text("放弃修改") } } })

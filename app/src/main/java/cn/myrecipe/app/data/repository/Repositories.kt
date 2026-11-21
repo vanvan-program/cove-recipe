@@ -27,7 +27,7 @@ interface TaxonomyRepository {
 /** Serializes mutations with backup and timer operations, so snapshots never mix generations. */
 class LocalRepository(val db: RecipeDatabase, val gate: Mutex) : RecipeRepository, ShoppingRepository, TaxonomyRepository {
     private val dao = db.dao()
-    val snapshot: Flow<AppSnapshot> = combine(dao.observeRecipes(), dao.observeCategories(), dao.observeTags(), dao.observeShopping(), dao.observeTimer()) { r, c, t, s, timer -> AppSnapshot(r, c, t, s, timer) }
+    val snapshot: Flow<AppSnapshot> = combine(dao.observeRecipes(), dao.observeCategories(), dao.observeTags(), dao.observeShopping(), dao.observeTimer()) { r, c, t, s, timer -> AppSnapshot(r.filter { it.recipe.deletedAt == null }, c, t, s, timer, r.filter { it.recipe.deletedAt != null }.sortedByDescending { it.recipe.deletedAt }) }
 
     override suspend fun save(full: RecipeFull) = gate.withLock {
         require(full.recipe.name.isNotBlank()) { "请填写菜名" }
@@ -48,7 +48,7 @@ class LocalRepository(val db: RecipeDatabase, val gate: Mutex) : RecipeRepositor
     }
     suspend fun reorderRecipes(visibleIds: List<String>) = gate.withLock {
         db.withTransaction {
-            val all = filterRecipes(AppSnapshot(recipes = dao.recipes()), "", "全部", null)
+            val all = filterRecipes(AppSnapshot(recipes = dao.recipes().filter { it.recipe.deletedAt == null }), "", "全部", null)
             val valid = all.map { it.recipe.id }.toSet()
             val requested = visibleIds.filter { it in valid }.distinct()
             // Reorder only the visible slots; hidden recipes and the pinned group keep their places.
@@ -63,7 +63,9 @@ class LocalRepository(val db: RecipeDatabase, val gate: Mutex) : RecipeRepositor
             }
         }
     }
-    override suspend fun delete(id: String) = gate.withLock { dao.deleteRecipe(id) }
+    override suspend fun delete(id: String) = gate.withLock { dao.setDeletedAt(id, System.currentTimeMillis()) }
+    suspend fun restoreRecipe(id: String) = gate.withLock { dao.setDeletedAt(id, null) }
+    suspend fun purgeRecipe(id: String) = gate.withLock { dao.purgeTrashed(id) }
     suspend fun toggle(id: String, favorite: Boolean? = null, pinned: Boolean? = null) = gate.withLock {
         dao.recipes().find { it.recipe.id == id }?.recipe?.let { dao.putRecipe(it.copy(favorite = favorite ?: it.favorite, pinned = pinned ?: it.pinned)) }
     }
