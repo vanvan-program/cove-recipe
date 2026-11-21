@@ -24,6 +24,16 @@ class UiDeviceTest {
         val recipe = Recipe(name = "番茄炒蛋"); val full = RecipeFull(recipe, listOf(RecipeIngredient(recipeId = recipe.id, name = "番茄", amount = "2", unit = "个"), RecipeIngredient(recipeId = recipe.id, name = "鸡蛋", amount = "3", unit = "个")), listOf(RecipeStep(recipeId = recipe.id, content = "鸡蛋打散后炒熟", heat = "中火", timerSeconds = 60), RecipeStep(recipeId = recipe.id, content = "加入番茄翻炒", heat = "大火")), emptyList())
         container.repository.save(full); full
     }
+    @Test fun settingsShowsInstalledVersionAndUpdateControls() {
+        compose.onNodeWithTag("nav-settings").performClick()
+        compose.onNodeWithText("关于版本").performScrollTo().performClick()
+        val info = compose.activity.packageManager.getPackageInfo(compose.activity.packageName, 0)
+        compose.onNodeWithText("当前版本 v" + info.versionName).assertIsDisplayed()
+        compose.onNodeWithText("检查更新").assertIsEnabled()
+        compose.onNodeWithText("下载源设置").performScrollTo().performClick()
+        compose.onNodeWithText("国内自建下载目录（可选）").performScrollTo().assertIsDisplayed()
+    }
+
     @Test fun createRecipeThroughEditor() {
         compose.onNodeWithTag("newRecipe").performClick()
         compose.onNodeWithText("菜名（必填）").performTextInput("青椒土豆丝")

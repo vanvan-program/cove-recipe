@@ -42,11 +42,20 @@ jobs:
           grep -E "^package: name='cn\.myrecipe\.app' versionCode='6' versionName='1\.5\.0'" "$RUNNER_TEMP/badging.txt"
           if "$sdk/apksigner" verify "$apk" >/dev/null 2>&1; then echo "Expected unsigned APK"; exit 1; fi
           sha256sum "$apk" | tee SHA256SUMS.txt
-          echo "ROOM4_BASE64=$(base64 -w0 "$GITHUB_WORKSPACE/app/schemas/cn.myrecipe.app.core.database.RecipeDatabase/4.json")"
+          git -C "$GITHUB_WORKSPACE" diff --exit-code -- app/schemas/
       - uses: actions/upload-artifact@v4
         with:
           name: CoveRecipe-1.5.0-Windows-signing-kit
           path: ${{ runner.temp }}/signing-kit/
           if-no-files-found: error
           compression-level: 0
-
+      - name: Enable emulator acceleration
+        run: sudo setfacl -m "u:$(id -un):rw" /dev/kvm
+      - name: Test upgrades, recycle bin and version screen on Android 15
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: bash gradlew :app:connectedDebugAndroidTest '-Pandroid.testInstrumentationRunnerArguments.class=cn.myrecipe.app.MigrationDeviceTest,cn.myrecipe.app.RepositoryDeviceTest#recipeSaveEditDeleteCascades,cn.myrecipe.app.RepositoryDeviceTest#trashBackupRetainsIngredientsAndStepsAfterRestore,cn.myrecipe.app.UiDeviceTest#settingsShowsInstalledVersionAndUpdateControls' --max-workers=2 --console=plain

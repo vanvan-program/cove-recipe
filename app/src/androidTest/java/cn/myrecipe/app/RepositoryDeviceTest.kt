@@ -46,9 +46,28 @@ class RepositoryDeviceTest {
         repo.delete(full.recipe.id)
         assertNotNull(db.dao().recipes().single().recipe.deletedAt)
         repo.restoreRecipe(full.recipe.id)
-        assertEquals(full.ingredients.map { it.id }.toSet(), db.dao().recipes().single().ingredients.map { it.id }.toSet())
+        assertNull(db.dao().recipes().single().recipe.deletedAt)
+        assertEquals("家常红烧肉", db.dao().recipes().single().recipe.name)
+        assertEquals(edited.ingredients, db.dao().recipes().single().ingredients)
         repo.delete(full.recipe.id); repo.purgeRecipe(full.recipe.id)
         assertTrue(db.dao().recipes().isEmpty()); assertTrue(db.dao().links().isEmpty())
+    }
+    @Test fun trashBackupRetainsIngredientsAndStepsAfterRestore() = runBlocking {
+        val full = recipe()
+        repo.delete(full.recipe.id)
+        val trashed = db.dao().recipes().single()
+        assertNotNull(trashed.recipe.deletedAt)
+        rejects { repo.save(full) }
+        val file = File(temp, "trash.zip")
+        backup.export(Uri.fromFile(file))
+        repo.purgeRecipe(full.recipe.id)
+        backup.restore(Uri.fromFile(file))
+        assertEquals(trashed, db.dao().recipes().single())
+        repo.restoreRecipe(full.recipe.id)
+        val restored = db.dao().recipes().single()
+        assertNull(restored.recipe.deletedAt)
+        assertEquals(trashed.ingredients, restored.ingredients)
+        assertEquals(trashed.steps, restored.steps)
     }
     @Test fun failedRecipeSavePreservesPreviousChildren() = runBlocking {
         val full = recipe(); rejects { repo.save(full.copy(recipe = full.recipe.copy(name = ""), ingredients = emptyList())) }; assertEquals("五花肉", db.dao().recipes().single().ingredients.single().name)
