@@ -33,6 +33,8 @@ import kotlinx.coroutines.withContext
         Text(title, style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f).padding(4.dp))
         actions()
     }
+    HorizontalDivider(Modifier.padding(horizontal = 14.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.46f))
+    Spacer(Modifier.height(6.dp))
 }
 @Composable fun Section(title: String) { Text(title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(top = 14.dp, bottom = 8.dp)) }
 @Composable fun Field(value: String, label: String, modifier: Modifier = Modifier, numeric: Boolean = false, singleLine: Boolean = true, onChange: (String) -> Unit) {

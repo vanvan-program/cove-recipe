@@ -65,7 +65,7 @@ internal fun openInstaller(context: Context, apk: File): Boolean {
             HorizontalDivider()
             TextButton(onClick = { settings = !settings }) { Text("下载源设置") }
             if (settings) {
-                Text("默认使用 GitHub，连接超时或连续 8 秒均速低于 128 KiB/s 时尝试 GHFast 加速。支持断点的来源会续传。")
+                Text("未配置自建源时先查 GitHub，连接失败会改用备用版本清单。下载超时或连续 8 秒均速低于 128 KiB/s 时会换源，支持断点的来源会续传。")
                 OutlinedTextField(value = mirror, onValueChange = { mirror = it }, modifier = Modifier.fillMaxWidth(), singleLine = true, enabled = !state.busy,
                     label = { Text("国内自建下载目录（可选）") }, placeholder = { Text("https://你的域名/apk/") })
                 Text("配置后优先从此目录下载同名 APK；也可在目录提供 GitHub 格式的 releases.json 用于备用版本检查。", style = MaterialTheme.typography.bodySmall)
@@ -73,6 +73,7 @@ internal fun openInstaller(context: Context, apk: File): Boolean {
             }
             TextButton(onClick = { history = !history }) { Text("版本更新目录") }
             if (history) {
+                Text("1.5.1　恢复皮革封面、纸纹和固定页签，修复备用线路检查更新。")
                 Text("1.5.0　菜谱排序与回收站、步骤滚轮、购物勾选和应用内更新。")
                 Text("1.4.0　菜谱拖动排序、调料和购物来源。")
                 Text("1.3.0　计时滚轮和到点震动确认。")

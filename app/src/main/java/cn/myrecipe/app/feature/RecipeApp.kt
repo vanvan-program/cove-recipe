@@ -3,7 +3,7 @@ package cn.myrecipe.app.feature
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.testTag
 import kotlinx.coroutines.launch
@@ -51,10 +51,10 @@ import kotlinx.coroutines.delay
             else if (snapshot.timer?.recipeId == target.first) { vm.notify("原菜谱已删除，可在计时条上管理计时器"); consumeTarget() }
         }
     }
-    Box(Modifier.fillMaxSize()) {
-    Scaffold(modifier = Modifier.imePadding(), snackbarHost = { SnackbarHost(snackbar, Modifier.padding(bottom = if (route == "recipes") 110.dp else 0.dp)) }) { padding ->
+    JournalBook {
+        Scaffold(containerColor = Color.Transparent, contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            snackbarHost = { SnackbarHost(snackbar) }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
-            if (route == "recipes") JournalBinding()
             snapshot.timer?.let { timer ->
                 Surface(color = MaterialTheme.colorScheme.secondaryContainer, modifier = Modifier.fillMaxWidth()) {
                     Row(Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
@@ -102,25 +102,13 @@ import kotlinx.coroutines.delay
                     else KitchenScreen(vm, full, back.arguments?.getString("step"), snapshot.timer) { nav.popBackStack() }
                 }
             }
-        }
-    }
-    if (route == "recipes") Surface(
-        modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp),
-        shape = RoundedCornerShape(28.dp), color = MaterialTheme.colorScheme.surfaceContainerHigh, shadowElevation = 8.dp
-    ) {
-        BoxWithConstraints {
-        val tabWidth = maxWidth / 3
-        val position = (pager.currentPage + pager.currentPageOffsetFraction).coerceIn(0f, 2f)
-        Surface(modifier = Modifier.align(Alignment.TopStart).offset(x = tabWidth * position + (tabWidth - 64.dp) / 2, y = 11.dp).width(64.dp).height(32.dp),
-            color = MaterialTheme.colorScheme.secondaryContainer, shape = RoundedCornerShape(16.dp)) { }
-        NavigationBar(containerColor = androidx.compose.ui.graphics.Color.Transparent, windowInsets = WindowInsets(0, 0, 0, 0)) {
-            listOf(Triple("菜谱", "recipes", Icons.Default.Home), Triple("购物清单", "shopping", Icons.Default.ShoppingCart), Triple("设置", "settings", Icons.Default.Settings)).forEachIndexed { index, (label, tag, icon) ->
-                NavigationBarItem(colors = NavigationBarItemDefaults.colors(indicatorColor = androidx.compose.ui.graphics.Color.Transparent), selected = pager.targetPage == index, onClick = { scope.launch { pager.animateScrollToPage(index) } }, modifier = Modifier.testTag("nav-$tag"), icon = { Icon(icon, null) }, label = { Text(label) })
+            if (route == "recipes") {
+                JournalTabs(pager.currentPage, (pager.currentPage + pager.currentPageOffsetFraction).coerceIn(0f, 2f)) {
+                    scope.launch { pager.animateScrollToPage(it) }
+                }
             }
         }
         }
     }
-    }
-
 }
 fun formatTime(millis: Long): String { val seconds = (millis.coerceAtLeast(0) + 999) / 1000; return if (seconds >= 3600) "%d:%02d:%02d".format(seconds / 3600, seconds / 60 % 60, seconds % 60) else "%02d:%02d".format(seconds / 60, seconds % 60) }

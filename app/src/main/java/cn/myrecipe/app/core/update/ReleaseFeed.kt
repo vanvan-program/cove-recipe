@@ -82,32 +82,37 @@ internal fun openHttps(address: String, offset: Long = 0L): HttpURLConnection {
     throw IOException("来源重定向次数过多")
 }
 
-internal fun latestRelease(mirror: String, checkActive: () -> Unit): Release {
+private fun readRelease(feed: String, checkActive: () -> Unit): Release {
+    val conn = openHttps(feed)
+    try {
+        if (conn.responseCode != 200) throw IOException("HTTP ${conn.responseCode}")
+        val data = java.io.ByteArrayOutputStream()
+        conn.inputStream.use { stream ->
+            val buffer = ByteArray(8192)
+            while (true) {
+                checkActive()
+                val n = stream.read(buffer)
+                if (n < 0) break
+                if (data.size() + n > 4 * 1024 * 1024) throw IOException("发布列表过大")
+                data.write(buffer, 0, n)
+            }
+        }
+        return parseReleases(data.toString("UTF-8"))
+    } finally { conn.disconnect() }
+}
+
+internal fun latestRelease(mirror: String, read: (String, () -> Unit) -> Release = ::readRelease, checkActive: () -> Unit): Release {
     val feeds = buildList {
-        add("$RELEASE_API?per_page=100")
         if (mirror.isNotEmpty()) add(mirror + "releases.json")
-        add(ACCELERATOR + RELEASE_API + "?per_page=100")
+        add("$RELEASE_API?per_page=100")
+        add(ACCELERATOR + "https://github.com/$REPOSITORY/releases/latest/download/releases.json")
+        add("https://cdn.jsdelivr.net/gh/$REPOSITORY@main/updates/releases.json")
     }
     var failure: Exception? = null
     for (feed in feeds) {
         checkActive()
         try {
-            val conn = openHttps(feed)
-            try {
-                if (conn.responseCode != 200) throw IOException("HTTP ${conn.responseCode}")
-                val data = java.io.ByteArrayOutputStream()
-                conn.inputStream.use { stream ->
-                    val buffer = ByteArray(8192)
-                    while (true) {
-                        checkActive()
-                        val n = stream.read(buffer)
-                        if (n < 0) break
-                        if (data.size() + n > 4 * 1024 * 1024) throw IOException("发布列表过大")
-                        data.write(buffer, 0, n)
-                    }
-                }
-                return parseReleases(data.toString("UTF-8"))
-            } finally { conn.disconnect() }
+            return read(feed, checkActive)
         } catch (e: java.util.concurrent.CancellationException) { throw e }
         catch (e: Exception) { failure = e }
     }

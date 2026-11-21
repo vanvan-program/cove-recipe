@@ -16,7 +16,10 @@ import cn.myrecipe.app.feature.RecipeApp
 class MainActivity : ComponentActivity() {
     private var timerTarget by mutableStateOf<Pair<String, String>?>(null)
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState); enableEdgeToEdge(); readTarget(intent)
+        super.onCreate(savedInstanceState)
+        val transparent = androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+        enableEdgeToEdge(statusBarStyle = transparent, navigationBarStyle = transparent)
+        readTarget(intent)
         val container = (application as RecipeApplication).container
         setContent {
             RecipeTheme {

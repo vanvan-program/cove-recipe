@@ -1,7 +1,7 @@
 name: Android build
 on:
   push:
-    branches: ['cove-recipe-1.5.0']
+    branches: ['cove-recipe-1.5.1']
   workflow_dispatch:
 permissions:
   contents: read
@@ -31,21 +31,21 @@ jobs:
           set -euo pipefail
           kit="$RUNNER_TEMP/signing-kit"
           mkdir -p "$kit"
-          cp app/build/outputs/apk/release/app-release-unsigned.apk "$kit/CoveRecipe-1.5.0-unsigned.apk"
+          cp app/build/outputs/apk/release/app-release-unsigned.apk "$kit/CoveRecipe-1.5.1-unsigned.apk"
           cp scripts/Sign-CoveRecipe.ps1 scripts/Sign.cmd "$kit/"
           cd "$kit"
-          apk=CoveRecipe-1.5.0-unsigned.apk
+          apk=CoveRecipe-1.5.1-unsigned.apk
           sdk="$ANDROID_HOME/build-tools/35.0.0"
           unzip -tq "$apk"
           "$sdk/zipalign" -c 4 "$apk"
           "$sdk/aapt" dump badging "$apk" > "$RUNNER_TEMP/badging.txt"
-          grep -E "^package: name='cn\.myrecipe\.app' versionCode='6' versionName='1\.5\.0'" "$RUNNER_TEMP/badging.txt"
+          grep -E "^package: name='cn\.myrecipe\.app' versionCode='7' versionName='1\.5\.1'" "$RUNNER_TEMP/badging.txt"
           if "$sdk/apksigner" verify "$apk" >/dev/null 2>&1; then echo "Expected unsigned APK"; exit 1; fi
           sha256sum "$apk" | tee SHA256SUMS.txt
           git -C "$GITHUB_WORKSPACE" diff --exit-code -- app/schemas/
       - uses: actions/upload-artifact@v4
         with:
-          name: CoveRecipe-1.5.0-Windows-signing-kit
+          name: CoveRecipe-1.5.1-Windows-signing-kit
           path: ${{ runner.temp }}/signing-kit/
           if-no-files-found: error
           compression-level: 0

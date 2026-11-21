@@ -27,6 +27,18 @@ class UpdateTest {
             override fun getHeaderField(name: String?) = if (name == "Content-Range") range else null
         }
 
+    @Test fun checkUsesAnActualReleaseFileWhenGithubApiIsUnavailable() {
+        val attempted = mutableListOf<String>()
+        val result = latestRelease("", read = { address, _ ->
+            attempted += address
+            if (address.startsWith(RELEASE_API)) throw IOException("HTTP 403")
+            release
+        }) {}
+        assertEquals(release, result)
+        assertEquals(listOf("$RELEASE_API?per_page=100",
+            "${ACCELERATOR}https://github.com/$REPOSITORY/releases/latest/download/releases.json"), attempted)
+    }
+
     @Test fun slowConnectionSwitchesToMirrorAndResumesAtLastByteWritten() {
         val part = temp.newFile()
         val offsets = mutableListOf<Long>()
