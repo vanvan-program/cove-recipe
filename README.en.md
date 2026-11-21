@@ -11,7 +11,7 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21%20%7C%20Compose%20%7C%20Room-7F52FF?style=flat-square)](#tech-stack--project-structure)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-[Download v1.5.0 APK](https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.0/CoveRecipe-1.5.0.apk) · [GHFast mirror](https://ghfast.top/https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.0/CoveRecipe-1.5.0.apk) · [Release notes and SHA-256 checksum](https://github.com/vanvan-program/cove-recipe/releases/tag/v1.5.0)
+[Download v1.5.1 APK](https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.1/CoveRecipe-1.5.1.apk) · [GHFast mirror](https://ghfast.top/https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.1/CoveRecipe-1.5.1.apk) · [Release notes and SHA-256 checksum](https://github.com/vanvan-program/cove-recipe/releases/tag/v1.5.1)
 
 [Changelog](CHANGELOG.md) · [Third-Party Notices](THIRD_PARTY_NOTICES.md) · [Issues](https://github.com/vanvan-program/cove-recipe/issues)
 
@@ -23,24 +23,23 @@
 
 Cove Recipe is a Chinese-language personal cookbook for Android 8.0 (API 26) and later. There are no ads or accounts. Recipes, photos, and shopping lists stay on your phone. You can record recipes and cook offline. The app connects to the internet when you check for updates or download a new version.
 
-## What’s new in v1.5.0
+## What’s new in v1.5.1
 
-- The About version screen shows the installed version and lets you check for, download, and install updates. [Upgrade steps and download sources](#installation--data-safety)
-- Sort recipes by date added, date edited, name, or cooking time. For a custom order, drag recipes into place.
-- Restore a deleted recipe from the recycle bin in Settings (回收站), along with its ingredients, seasonings, and steps.
-- When adding a recipe to the shopping list, ingredients are selected by default and seasonings are optional. Matching items are combined and retain their source recipe names.
+- The rice sprig, stitched leather cover, textured paper and three layered page edges now frame the whole app. The status bar takes on the cover color.
+- Recipes, Shopping and Settings are fixed tabs at the foot of the page. Add actions sit above the lists.
+- Update checks can read the release manifest through alternate routes if the GitHub API is unavailable.
 
 ## Screenshots
 
-Captured from the published v1.5.0 APK on an Android 15 emulator using sample recipes.
+Captured from the published v1.5.1 APK on an Android 15 emulator using sample recipes.
 
 | Recipe list | Recipe details | Shopping list |
 | :---: | :---: | :---: |
-| <a href="docs/screenshots/150-home.png"><img src="docs/screenshots/150-home.png" width="230" alt="Pinned recipes with preparation and cooking times" /></a> | <a href="docs/screenshots/150-detail.png"><img src="docs/screenshots/150-detail.png" width="230" alt="Tomato and egg stir-fry with its ingredients and preparation notes" /></a> | <a href="docs/screenshots/150-shopping.png"><img src="docs/screenshots/150-shopping.png" width="230" alt="Shopping items and the recipes they came from" /></a> |
+| <a href="docs/screenshots/151-home.webp"><img src="docs/screenshots/151-home.webp" width="230" alt="Pinned recipes with preparation and cooking times" /></a> | <a href="docs/screenshots/151-detail.webp"><img src="docs/screenshots/151-detail.webp" width="230" alt="Tomato and egg stir-fry with its ingredients and preparation notes" /></a> | <a href="docs/screenshots/151-shopping.webp"><img src="docs/screenshots/151-shopping.webp" width="230" alt="Shopping items and the recipes they came from" /></a> |
 
 | Sort menu | Recycle bin | Version and downloads |
 | :---: | :---: | :---: |
-| <a href="docs/screenshots/150-sort.png"><img src="docs/screenshots/150-sort.png" width="230" alt="Sort options on the recipe list" /></a> | <a href="docs/screenshots/150-trash.png"><img src="docs/screenshots/150-trash.png" width="230" alt="Deleted recipes and their restore buttons" /></a> | <a href="docs/screenshots/150-about.png"><img src="docs/screenshots/150-about.png" width="230" alt="Installed version v1.5.0 and download source settings" /></a> |
+| <a href="docs/screenshots/151-sort.webp"><img src="docs/screenshots/151-sort.webp" width="230" alt="Sort options on the recipe list" /></a> | <a href="docs/screenshots/151-trash.webp"><img src="docs/screenshots/151-trash.webp" width="230" alt="Deleted recipes and their restore buttons" /></a> | <a href="docs/screenshots/151-about.webp"><img src="docs/screenshots/151-about.webp" width="230" alt="Installed version v1.5.1 and download source settings" /></a> |
 
 ## Key Features
 
@@ -60,7 +59,7 @@ Captured from the published v1.5.0 APK on an Android 15 emulator using sample re
 ## Installation & Data Safety
 
 - **First install or upgrade from v1.4.0.** Use either download link at the top for the same signed APK. To keep your recipes, open the APK with the old version still installed and choose **Update**.
-- **Updates from v1.5.0 onward.** Open Settings → About version → Check for updates (设置 → 关于版本 → 检查更新). When an update is available, tap 下载更新 to download it. After verification, tap 安装更新 and confirm in Android.
+- **Updates from v1.5.0 onward.** Open Settings → About version → Check for updates (设置 → 关于版本 → 检查更新). When an update is available, tap 下载更新 to download it. After verification, tap 安装更新 and confirm in Android. If v1.5.0 cannot check for updates, download the APK above and install it over the existing app.
 - **Slow downloads.** The app starts with GitHub and tries GHFast if the connection times out or averages below 128 KiB/s for 8 seconds. To prefer your own HTTPS mirror, enter its base URL in 下载源设置. Downloads resume across sources when the next server supports byte ranges.
 - The package name is `cn.myrecipe.app`. To upgrade using your own build, sign it with the same key as the installed app. You can export a ZIP backup from Settings. Android cloud backup and device transfer are disabled.
 - Grant **Notifications** and **Exact Alarms** for reliable background cooking timers. Exported ZIP backups are unencrypted—store them safely.
@@ -85,7 +84,8 @@ cd cove-recipe
 
 - The debug APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
 - On macOS / Linux, use `./gradlew`. With a local `.tools/` cache, run `.\scripts\build.ps1 -Offline` (add `-DeviceTests` for emulator tests).
-- The v1.5.0 build passed unit tests, Android lint, and Android 15 emulator tests. [View the build and test results](https://github.com/vanvan-program/cove-recipe/actions/runs/44909994286)
+- The v1.5.1 build passed unit tests, Android lint, and Android 15 emulator tests. [View the build and test results](https://github.com/vanvan-program/cove-recipe/actions/runs/44917329446)
+- For each release, run `python scripts/release-feed.py CoveRecipe-X.Y.Z.apk updates/releases.json` with the signed APK. Commit the resulting manifest to the default branch and upload the same `releases.json` as a release asset.
 
 ## License
 

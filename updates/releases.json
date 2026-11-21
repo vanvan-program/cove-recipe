@@ -1,0 +1,15 @@
+[
+  {
+    "tag_name": "v1.5.1",
+    "draft": false,
+    "prerelease": false,
+    "assets": [
+      {
+        "name": "CoveRecipe-1.5.1.apk",
+        "size": 7983790,
+        "state": "uploaded",
+        "digest": "sha256:a1b5dbc57dc99e116ebb5652a77f85b6b5bc02efd354c72a03d31f7cfb4269d3"
+      }
+    ]
+  }
+]

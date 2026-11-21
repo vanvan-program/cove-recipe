@@ -11,7 +11,7 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21%20%7C%20Compose%20%7C%20Room-7F52FF?style=flat-square)](#技术栈与工程结构)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-[下载 v1.5.0 APK](https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.0/CoveRecipe-1.5.0.apk) · [国内加速下载（GHFast）](https://ghfast.top/https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.0/CoveRecipe-1.5.0.apk) · [发布说明与 SHA-256 校验文件](https://github.com/vanvan-program/cove-recipe/releases/tag/v1.5.0)
+[下载 v1.5.1 APK](https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.1/CoveRecipe-1.5.1.apk) · [国内加速下载（GHFast）](https://ghfast.top/https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.1/CoveRecipe-1.5.1.apk) · [发布说明与 SHA-256 校验文件](https://github.com/vanvan-program/cove-recipe/releases/tag/v1.5.1)
 
 [更新日志](CHANGELOG.md) · [第三方组件说明](THIRD_PARTY_NOTICES.md) · [问题反馈](https://github.com/vanvan-program/cove-recipe/issues)
 
@@ -23,24 +23,23 @@
 
 Cove Recipe 是一款中文 Android 个人菜谱本，支持 Android 8.0（API 26）及以上。应用无广告，无需注册账号。菜谱、图片和购物清单只保存在手机上，记录菜谱和做饭都可以离线使用。手动检查更新或下载新版时才会联网。
 
-## v1.5.0 更新
+## v1.5.1 更新
 
-- 「关于版本」显示已安装的版本号，可检查、下载和安装更新。[查看升级步骤与下载源说明](#安装与数据安全)
-- 首页支持按添加时间、修改时间、名称或烹饪时长排序，也可以长按拖动，自定义菜谱顺序。
-- 误删菜谱后，可到「设置 → 回收站」恢复，食材、调料和步骤会一起找回。
-- 从菜谱添加购物项时，默认勾选食材，可按需勾选调料。同名食材会合并，并保留来源菜名。
+- 稻穗回到左上角。皮革、缝线和暖白纸纹围住整本菜谱，右侧可见三层书页，状态栏沿用封面底色。
+- 菜谱、购物清单、设置三个页签固定在页底。菜谱和购物清单的新增按钮移到列表上方。
+- 修复 GitHub 接口不可用时检查更新失败的问题，备用线路现在直接读取发布附件中的版本清单。
 
 ## 界面示例
 
-以下截图取自已发布的 v1.5.0 APK，在 Android 15 模拟器上使用示例菜谱拍摄。
+以下截图取自已发布的 v1.5.1 APK，在 Android 15 模拟器上使用示例菜谱拍摄。
 
 | 菜谱首页 | 菜谱详情 | 购物清单 |
 | :---: | :---: | :---: |
-| <a href="docs/screenshots/150-home.png"><img src="docs/screenshots/150-home.png" width="230" alt="置顶菜谱与准备、烹饪时间" /></a> | <a href="docs/screenshots/150-detail.png"><img src="docs/screenshots/150-detail.png" width="230" alt="番茄炒蛋的食材和备菜说明" /></a> | <a href="docs/screenshots/150-shopping.png"><img src="docs/screenshots/150-shopping.png" width="230" alt="购物项及其来源菜谱" /></a> |
+| <a href="docs/screenshots/151-home.webp"><img src="docs/screenshots/151-home.webp" width="230" alt="置顶菜谱与准备、烹饪时间" /></a> | <a href="docs/screenshots/151-detail.webp"><img src="docs/screenshots/151-detail.webp" width="230" alt="番茄炒蛋的食材和备菜说明" /></a> | <a href="docs/screenshots/151-shopping.webp"><img src="docs/screenshots/151-shopping.webp" width="230" alt="购物项及其来源菜谱" /></a> |
 
 | 排序菜单 | 回收站 | 关于版本与下载源 |
 | :---: | :---: | :---: |
-| <a href="docs/screenshots/150-sort.png"><img src="docs/screenshots/150-sort.png" width="230" alt="首页可选的菜谱排序方式" /></a> | <a href="docs/screenshots/150-trash.png"><img src="docs/screenshots/150-trash.png" width="230" alt="回收站内的菜谱及恢复按钮" /></a> | <a href="docs/screenshots/150-about.png"><img src="docs/screenshots/150-about.png" width="230" alt="已安装版本 v1.5.0 和下载源设置" /></a> |
+| <a href="docs/screenshots/151-sort.webp"><img src="docs/screenshots/151-sort.webp" width="230" alt="首页可选的菜谱排序方式" /></a> | <a href="docs/screenshots/151-trash.webp"><img src="docs/screenshots/151-trash.webp" width="230" alt="回收站内的菜谱及恢复按钮" /></a> | <a href="docs/screenshots/151-about.webp"><img src="docs/screenshots/151-about.webp" width="230" alt="已安装版本 v1.5.1 和下载源设置" /></a> |
 
 ## 核心功能
 
@@ -60,7 +59,7 @@ Cove Recipe 是一款中文 Android 个人菜谱本，支持 Android 8.0（API 2
 ## 安装与数据安全
 
 - **首次安装或从 v1.4.0 升级**　使用页首的官方或加速链接下载同一个已签名 APK。在旧版仍安装的手机上打开 APK，选择「更新」即可保留菜谱。
-- **从 v1.5.0 起**　打开「设置 → 关于版本 → 检查更新」。有新版时，点「下载更新」，校验通过后点「安装更新」，并在 Android 提示中确认。
+- **从 v1.5.0 起**　打开「设置 → 关于版本 → 检查更新」。有新版时，点「下载更新」，校验通过后点「安装更新」，并在 Android 提示中确认。 如果 v1.5.0 检查更新失败，可从页首下载 APK，保留旧应用并直接覆盖安装。
 - **下载慢时**　默认从 GitHub 下载。连接超时或连续 8 秒平均速度低于 128 KiB/s 时，应用会尝试 GHFast。也可在「下载源设置」填写自建 HTTPS 镜像目录，保存后会优先使用。换源后，支持断点续传的服务器可以接着下载。
 - 应用包名为 `cn.myrecipe.app`。自行构建时需使用与旧版相同的签名才能覆盖安装。可在「设置」中导出 ZIP 备份，系统云备份与设备迁移均已关闭。
 - 首次使用计时器需授予「通知」与「精确闹钟」权限；锁屏与常规切后台可持续计时，手机重启后进行中的计时会标记为中断且不补响。
@@ -87,7 +86,8 @@ cd cove-recipe
 
 - 编译成功后，调试包在 `app/build/outputs/apk/debug/app-debug.apk`。
 - macOS / Linux 使用 `./gradlew` 执行相同任务；本机具备 `.tools/` 离线环境时可运行 `.\scripts\build.ps1 -Offline`（加 `-DeviceTests` 运行模拟器测试）。
-- v1.5.0 的单元测试、Android lint 和 Android 15 模拟器测试均已通过。[查看构建与测试记录](https://github.com/vanvan-program/cove-recipe/actions/runs/44909994286)
+- v1.5.1 的单元测试、Android lint 和 Android 15 模拟器测试均已通过。[查看构建与测试记录](https://github.com/vanvan-program/cove-recipe/actions/runs/44917329446)
+- 发布新版时，用 `python scripts/release-feed.py CoveRecipe-X.Y.Z.apk updates/releases.json` 生成与签名 APK 匹配的版本清单。将同一份 `releases.json` 提交到主分支并作为 Release 附件上传，供备用线路读取。
 
 ## 开源协议
 
