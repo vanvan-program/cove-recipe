@@ -11,7 +11,9 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21%20%7C%20Compose%20%7C%20Room-7F52FF?style=flat-square)](#技术栈与工程结构)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-[下载安装包（Releases）](https://github.com/vanvan-program/cove-recipe/releases) · [更新日志](CHANGELOG.md) · [第三方组件说明](THIRD_PARTY_NOTICES.md) · [问题反馈](https://github.com/vanvan-program/cove-recipe/issues)
+[下载 v1.5.0 APK](https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.0/CoveRecipe-1.5.0.apk) · [国内加速下载（GHFast）](https://ghfast.top/https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.0/CoveRecipe-1.5.0.apk) · [发布说明与 SHA-256 校验文件](https://github.com/vanvan-program/cove-recipe/releases/tag/v1.5.0)
+
+[更新日志](CHANGELOG.md) · [第三方组件说明](THIRD_PARTY_NOTICES.md) · [问题反馈](https://github.com/vanvan-program/cove-recipe/issues)
 
 </div>
 
@@ -19,14 +21,18 @@
 
 ## 项目定位
 
-**Cove Recipe** 是一款菜谱离线可用、本地优先的 Android 个人菜谱本（最低支持 Android 8 / API 26，目标 SDK 为 Android 16 / API 36）。专注记录与烹饪体验本身：**无账号、无广告、无云端同步。联网用于你手动发起的版本检查和安装包下载**。
+Cove Recipe 是一款中文 Android 个人菜谱本，支持 Android 8.0（API 26）及以上。应用无广告，无需注册账号。菜谱、图片和购物清单只保存在手机上，记录菜谱和做饭都可以离线使用。手动检查更新或下载新版时才会联网。
 
-> [!TIP]
-> 1.1.0 ～ 1.5.0 的逐版本更新说明已整理至 **[CHANGELOG.md](CHANGELOG.md)**。
+## v1.5.0 更新
+
+- 「关于版本」显示已安装的版本号，可检查、下载和安装更新。[查看升级步骤与下载源说明](#安装与数据安全)
+- 首页支持按添加时间、修改时间、名称或烹饪时长排序，也可以长按拖动，自定义菜谱顺序。
+- 误删菜谱后，可到「设置 → 回收站」恢复，食材、调料和步骤会一起找回。
+- 从菜谱添加购物项时，默认勾选食材，可按需勾选调料。同名食材会合并，并保留来源菜名。
 
 ## 界面示例
 
-以下为 1.4.0 专用模拟器测试截图（使用测试菜谱数据）：
+1.4.0 的界面截图，使用模拟器中的示例菜谱。
 
 <p>
   <img src="docs/screenshots/140-home.png" width="230" alt="菜谱首页" />
@@ -45,22 +51,24 @@
 - **可追踪来源的购物清单**：
   - 支持从单道菜谱、首页多选或购物页直接批量加入食材与调料；自动合并同名食材并保留「来自：菜名」来源标注。
   - 支持采购备注、已买勾选与删除撤销。
-- **ZIP v3 完整备份与严格校验**：
-  - 单文件 ZIP 打包全部菜谱、分类、标签、购物清单与封面图片（兼容导入格式 v1 / v2）。
+- **ZIP v4 完整备份与校验**：
+  - 单个 ZIP 包含菜谱（含回收站）、分类、标签、购物清单和封面图片。可导入 v1、v2、v3 和 v4 格式的备份。
   - 恢复前先校验版本、引用关系、大小上限（单 JSON ≤ 16 MB、单图 ≤ 32 MB、解压总量 ≤ 256 MB）与图片合法性，事务内原子替换，失败不破坏原数据。
 
 ## 安装与数据安全
 
-- 可从 [GitHub Releases](https://github.com/vanvan-program/cove-recipe/releases) 下载发布包，或自行构建 `app/build/outputs/apk/debug/app-debug.apk`（PowerShell 脚本另复制为 `dist/CoveRecipe-1.5.0.apk`）。
-- 应用包名为 `cn.myrecipe.app`。升级请**直接覆盖安装**并保持同一签名，切勿先卸载；不同电脑生成的 debug 签名不同，换包或卸载前请务必在设置中导出 ZIP 备份（系统云备份与设备迁移均已关闭）。
+- **首次安装或从 v1.4.0 升级**　使用页首的官方或加速链接下载同一个已签名 APK。在旧版仍安装的手机上打开 APK，选择「更新」即可保留菜谱。
+- **从 v1.5.0 起**　打开「设置 → 关于版本 → 检查更新」。有新版时，点「下载更新」，校验通过后点「安装更新」，并在 Android 提示中确认。
+- **下载慢时**　默认从 GitHub 下载。连接超时或连续 8 秒平均速度低于 128 KiB/s 时，应用会尝试 GHFast。也可在「下载源设置」填写自建 HTTPS 镜像目录，保存后会优先使用。换源后，支持断点续传的服务器可以接着下载。
+- 应用包名为 `cn.myrecipe.app`。自行构建时需使用与旧版相同的签名才能覆盖安装。可在「设置」中导出 ZIP 备份，系统云备份与设备迁移均已关闭。
 - 首次使用计时器需授予「通知」与「精确闹钟」权限；锁屏与常规切后台可持续计时，手机重启后进行中的计时会标记为中断且不补响。
 - 导出的 ZIP 备份未加密，请妥善保存在信任的位置。
 
 ## 技术栈与工程结构
 
-- **技术栈**：Kotlin `2.0.21` · Jetpack Compose (BOM `2025.02.00`) · Material 3 · Room `2.6.1`（数据库 v3，支持显式无损迁移）· Navigation `2.8.9` · DataStore `1.1.3` · AGP `8.9.2` · Gradle `8.11.1`
+- **技术栈**：Kotlin `2.0.21` · Jetpack Compose (BOM `2025.02.00`) · Material 3 · Room `2.6.1`（数据库 v4，支持从 v1 至 v3 迁移）· Navigation `2.8.9` · DataStore `1.1.3` · AGP `8.9.2` · Gradle `8.11.1`
 - **模块划分**（单 `app` 模块）：
-  - `core` — Room 数据库、图片管理、计时服务、ZIP 备份契约与主题
+  - `core` — Room 数据库、图片管理、计时服务、ZIP 备份、应用内更新与主题
   - `data/repository` — 本地仓库层
   - `feature` — 菜谱、编辑、厨房模式、购物清单、分类标签与设置页面（ViewModel + StateFlow）
 
@@ -75,7 +83,9 @@ cd cove-recipe
 .\gradlew.bat :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-- macOS / Linux 使用 `./gradlew` 执行相同任务；本机具备 `.tools/` 离线环境时可运行 `.\scripts\build.ps1 -Offline`（加 `-DeviceTests` 运行模拟器测试）。验证说明见 `docs/1.4.0验证.md`。
+- 编译成功后，调试包在 `app/build/outputs/apk/debug/app-debug.apk`。
+- macOS / Linux 使用 `./gradlew` 执行相同任务；本机具备 `.tools/` 离线环境时可运行 `.\scripts\build.ps1 -Offline`（加 `-DeviceTests` 运行模拟器测试）。
+- v1.5.0 的单元测试、Android lint 和 Android 15 模拟器测试均已通过。[查看构建与测试记录](https://github.com/vanvan-program/cove-recipe/actions/runs/44909994286)
 
 ## 开源协议
 
