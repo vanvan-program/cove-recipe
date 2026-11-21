@@ -28,6 +28,8 @@ interface RecipeDao {
     @Query("DELETE FROM ingredients WHERE recipeId = :id") suspend fun deleteIngredients(id: String)
     @Query("DELETE FROM steps WHERE recipeId = :id") suspend fun deleteSteps(id: String)
     @Query("DELETE FROM recipe_tags WHERE recipeId = :id") suspend fun deleteLinks(id: String)
+    @Query("UPDATE recipes SET deletedAt = :at WHERE id = :id") suspend fun setDeletedAt(id: String, at: Long?)
+    @Query("DELETE FROM recipes WHERE id = :id AND deletedAt IS NOT NULL") suspend fun purgeTrashed(id: String)
     @Query("DELETE FROM recipes WHERE id = :id") suspend fun deleteRecipe(id: String)
     @Query("DELETE FROM categories WHERE id = :id") suspend fun deleteCategory(id: String)
     @Query("DELETE FROM tags WHERE id = :id") suspend fun deleteTag(id: String)
@@ -39,11 +41,16 @@ interface RecipeDao {
     @Query("DELETE FROM categories") suspend fun clearCategories()
     @Query("DELETE FROM tags") suspend fun clearTags()
 }
-@Database(entities = [Recipe::class, RecipeIngredient::class, RecipeStep::class, Category::class, Tag::class, RecipeTag::class, ShoppingItem::class, ActiveTimer::class], version = 3, exportSchema = true)
+@Database(entities = [Recipe::class, RecipeIngredient::class, RecipeStep::class, Category::class, Tag::class, RecipeTag::class, ShoppingItem::class, ActiveTimer::class], version = 4, exportSchema = true)
 @TypeConverters(ShoppingSourcesConverter::class)
 abstract class RecipeDatabase : RoomDatabase() {
     abstract fun dao(): RecipeDao
     companion object {
+        val MIGRATION_3_4 = object : androidx.room.migration.Migration(3, 4) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE recipes ADD COLUMN deletedAt INTEGER")
+            }
+        }
         val MIGRATION_2_3 = object : androidx.room.migration.Migration(2, 3) {
             override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE recipes ADD COLUMN sortOrder INTEGER NOT NULL DEFAULT 0")

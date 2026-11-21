@@ -1,0 +1,73 @@
+name: Android build
+on:
+  push:
+    branches: ['cove-recipe-1.5.0']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - run: $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Check Windows signing script syntax
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          $null = [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path 'scripts/Sign-CoveRecipe.ps1'), [ref]$tokens, [ref]$errors)
+          if ($errors.Count) { throw ($errors -join [Environment]::NewLine) }
+      - name: Assemble and test
+        run: bash gradlew :app:assembleRelease :app:testDebugUnitTest :app:assembleDebugAndroidTest :app:lintDebug --console=plain --max-workers=2
+      - name: Verify unsigned APK and prepare signing kit
+        run: |
+          set -euo pipefail
+          kit="$RUNNER_TEMP/signing-kit"
+          mkdir -p "$kit"
+          cp app/build/outputs/apk/release/app-release-unsigned.apk "$kit/CoveRecipe-1.5.0-unsigned.apk"
+          cp scripts/Sign-CoveRecipe.ps1 scripts/Sign.cmd "$kit/"
+          cd "$kit"
+          apk=CoveRecipe-1.5.0-unsigned.apk
+          sdk="$ANDROID_HOME/build-tools/35.0.0"
+          unzip -tq "$apk"
+          "$sdk/zipalign" -c 4 "$apk"
+          "$sdk/aapt" dump badging "$apk" > "$RUNNER_TEMP/badging.txt"
+          grep -E "^package: name='cn\.myrecipe\.app' versionCode='6' versionName='1\.5\.0'" "$RUNNER_TEMP/badging.txt"
+          if "$sdk/apksigner" verify "$apk" >/dev/null 2>&1; then echo "Expected unsigned APK"; exit 1; fi
+          sha256sum "$apk" | tee SHA256SUMS.txt
+          git -C "$GITHUB_WORKSPACE" diff --exit-code -- app/schemas/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CoveRecipe-1.5.0-Windows-signing-kit
+          path: ${{ runner.temp }}/signing-kit/
+          if-no-files-found: error
+          compression-level: 0
+      - name: Enable emulator acceleration
+        run: sudo setfacl -m "u:$(id -un):rw" /dev/kvm
+      - name: Test upgrades, recycle bin and version screen on Android 15
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: bash gradlew :app:connectedDebugAndroidTest '-Pandroid.testInstrumentationRunnerArguments.class=cn.myrecipe.app.MigrationDeviceTest,cn.myrecipe.app.RepositoryDeviceTest#recipeSaveEditDeleteCascades,cn.myrecipe.app.RepositoryDeviceTest#trashBackupRetainsIngredientsAndStepsAfterRestore,cn.myrecipe.app.UiDeviceTest#settingsShowsInstalledVersionAndUpdateControls' --max-workers=2 --console=plain
+      - name: Show device test failures
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          for file in Path("app/build/outputs/androidTest-results").rglob("*.xml"):
+              for case in ET.parse(file).iter("testcase"):
+                  failure = case.find("failure")
+                  if failure is not None:
+                      print(case.get("name"), (failure.text or "")[:5000])
+          PY

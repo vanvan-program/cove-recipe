@@ -24,10 +24,28 @@ class UiDeviceTest {
         val recipe = Recipe(name = "番茄炒蛋"); val full = RecipeFull(recipe, listOf(RecipeIngredient(recipeId = recipe.id, name = "番茄", amount = "2", unit = "个"), RecipeIngredient(recipeId = recipe.id, name = "鸡蛋", amount = "3", unit = "个")), listOf(RecipeStep(recipeId = recipe.id, content = "鸡蛋打散后炒熟", heat = "中火", timerSeconds = 60), RecipeStep(recipeId = recipe.id, content = "加入番茄翻炒", heat = "大火")), emptyList())
         container.repository.save(full); full
     }
+    @Test fun settingsShowsInstalledVersionAndUpdateControls() {
+        compose.onNodeWithTag("nav-settings").performClick()
+        compose.mainClock.advanceTimeBy(750)
+        compose.waitForIdle()
+        compose.onNodeWithText("关于版本").performScrollTo().assertIsDisplayed().performTouchInput { click() }
+        compose.mainClock.advanceTimeBy(750)
+        compose.waitForIdle()
+        val info = compose.activity.packageManager.getPackageInfo(compose.activity.packageName, 0)
+        compose.onNodeWithText("当前版本 v" + info.versionName).assertIsDisplayed()
+        compose.onNodeWithText("检查更新").assertIsEnabled()
+        compose.onNodeWithText("下载源设置").performScrollTo().performClick()
+        compose.onNode(hasSetTextAction()).performScrollTo().performTextReplacement("https://example.org/recipes/")
+        compose.onNodeWithText("保存下载源").performScrollTo().performClick()
+        compose.onNodeWithText("下载源已保存").performScrollTo().assertIsDisplayed()
+        assertEquals("https://example.org/recipes/", compose.activity.getSharedPreferences("update_sources", 0).getString("mirror", ""))
+        compose.activity.getSharedPreferences("update_sources", 0).edit().remove("mirror").commit()
+    }
+
     @Test fun createRecipeThroughEditor() {
         compose.onNodeWithTag("newRecipe").performClick()
         compose.onNodeWithText("菜名（必填）").performTextInput("青椒土豆丝")
-        compose.onNodeWithText("保存", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("保存菜谱", useUnmergedTree = true).performClick()
         compose.waitUntil(5000) { compose.onAllNodesWithText("青椒土豆丝").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithText("青椒土豆丝").assertIsDisplayed()
         assertEquals("青椒土豆丝", runBlocking { container.db.dao().recipes().single().recipe.name })
@@ -128,7 +146,7 @@ class UiDeviceTest {
         compose.onNodeWithText("分类：家常菜").assertExists()
         compose.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("备菜说明"))
         compose.onNodeWithText("备菜说明").performTextInput("番茄切块，鸡蛋打散。")
-        compose.onNodeWithText("保存", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("保存菜谱", useUnmergedTree = true).performClick()
         compose.waitUntil(5000) { runBlocking { container.db.dao().recipes().any { it.recipe.name == "备菜测试" } } }
         val stored = runBlocking { container.db.dao().recipes().single() }
         assertEquals("番茄切块，鸡蛋打散。", stored.recipe.preparation)
@@ -186,7 +204,7 @@ class UiDeviceTest {
         compose.onNodeWithText("＋ 添加食材").performClick()
         compose.waitUntil(5000) { compose.onAllNodesWithText("食材名称").fetchSemanticsNodes().any { it.config.getOrElse(androidx.compose.ui.semantics.SemanticsProperties.Focused) { false } } }
         compose.onNodeWithText("食材名称").assertIsFocused().performTextInput("蒜")
-        compose.onNodeWithText("保存", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("保存菜谱", useUnmergedTree = true).performClick()
         compose.waitUntil(5000) { runBlocking { container.db.dao().recipes().any { it.recipe.name == "自动聚焦测试" } } }
         assertEquals("蒜", runBlocking { container.db.dao().recipes().single().ingredients.single().name })
     }
@@ -231,7 +249,7 @@ class UiDeviceTest {
         compose.waitUntil(5000) { compose.onAllNodesWithText("调料名称").fetchSemanticsNodes().any { it.config.getOrElse(androidx.compose.ui.semantics.SemanticsProperties.Focused) { false } } }
         compose.onNodeWithText("调料名称").performTextInput("蚝油")
         compose.onNodeWithText("数量").performTextInput("2"); compose.onNodeWithText("单位（可自定义）").performTextInput("勺")
-        compose.onNodeWithText("保存", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("保存菜谱", useUnmergedTree = true).performClick()
         compose.waitUntil(5000) { runBlocking { container.db.dao().recipes().any { it.recipe.name == "调料测试" } } }
         val full = runBlocking { container.db.dao().recipes().single() }; assertTrue(full.foodIngredients.isEmpty()); assertEquals("蚝油", full.seasonings.single().name)
         compose.onNodeWithText("调料测试").performClick()

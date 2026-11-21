@@ -9,6 +9,16 @@ import java.io.IOException
 
 private val Context.preferences by preferencesDataStore("recipe_preferences")
 class Preferences(private val context: Context) {
+    private val sortKey = stringPreferencesKey("recipe_sort")
+    private val descKey = booleanPreferencesKey("sort_desc")
+    val sort = context.preferences.data.catch { if (it is IOException) emit(emptyPreferences()) else throw it }.map {
+        val key = it[sortKey]
+        val sort = cn.myrecipe.app.core.database.RecipeSort.entries.find { item -> item.name == key } ?: cn.myrecipe.app.core.database.RecipeSort.MANUAL
+        sort to (it[descKey] ?: false)
+    }
+    suspend fun saveSort(sort: cn.myrecipe.app.core.database.RecipeSort, desc: Boolean) {
+        context.preferences.edit { it[sortKey] = sort.name; it[descKey] = desc }
+    }
     private val modeKey = stringPreferencesKey("home_mode")
     private val categoryKey = stringPreferencesKey("home_category")
     val home = context.preferences.data.catch { if (it is IOException) emit(emptyPreferences()) else throw it }.map { Pair(it[modeKey] ?: "全部", it[categoryKey]) }

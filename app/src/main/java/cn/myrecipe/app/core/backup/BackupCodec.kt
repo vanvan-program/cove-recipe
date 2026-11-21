@@ -8,7 +8,7 @@ import java.util.UUID
 data class BackupData(val recipes: List<RecipeFull>, val categories: List<Category>, val tags: List<Tag>, val shopping: List<ShoppingItem>)
 
 object BackupCodec {
-    const val VERSION = 3
+    const val VERSION = 4
     val names = setOf("manifest.json", "recipes.json", "categories.json", "tags.json", "shopping.json")
     private fun objects(array: JSONArray): List<JSONObject> {
         require(array.length() <= 50000) { "备份项目过多" }
@@ -24,7 +24,7 @@ object BackupCodec {
         "shopping.json" to JSONArray(data.shopping.map { JSONObject().put("id", it.id).put("name", it.name).put("sourceRecipeNames", JSONArray(it.sourceRecipeNames)).put("note", it.note).put("bought", it.bought).put("sortOrder", it.sortOrder).put("createdAt", it.createdAt).put("updatedAt", it.updatedAt) }).toString(),
         "recipes.json" to JSONArray(data.recipes.map { full ->
             val r = full.recipe
-            JSONObject().put("id", r.id).put("name", r.name).put("description", r.description).put("preparation", r.preparation).put("sortOrder", r.sortOrder).putNullable("coverPath", r.coverPath).putNullable("categoryId", r.categoryId)
+            JSONObject().put("id", r.id).putNullable("deletedAt", r.deletedAt).put("name", r.name).put("description", r.description).put("preparation", r.preparation).put("sortOrder", r.sortOrder).putNullable("coverPath", r.coverPath).putNullable("categoryId", r.categoryId)
                 .putNullable("prepareMinutes", r.prepareMinutes).putNullable("cookMinutes", r.cookMinutes).put("favorite", r.favorite).put("pinned", r.pinned)
                 .putNullable("lastUsedAt", r.lastUsedAt).put("createdAt", r.createdAt).put("updatedAt", r.updatedAt)
                 .put("tagIds", JSONArray(full.tags.map { it.id }))
@@ -35,13 +35,13 @@ object BackupCodec {
     fun decode(entries: Map<String, String>): BackupData {
         require(entries.keys == names) { "备份缺少必要的数据文件" }
         val manifest = JSONObject(entries.getValue("manifest.json"))
-        require(manifest.getString("format") == "my-recipe-backup" && manifest.get("version") in listOf(1, 2, VERSION)) { "不支持此备份格式或版本" }
+        require(manifest.getString("format") == "my-recipe-backup" && manifest.get("version") in listOf(1, 2, 3, VERSION)) { "不支持此备份格式或版本" }
         val categories = objects(JSONArray(entries.getValue("categories.json"))).map { Category(it.getString("id"), it.getString("name"), it.nullString("parentId"), it.getInt("sortOrder")) }
         val tags = objects(JSONArray(entries.getValue("tags.json"))).map { Tag(it.getString("id"), it.getString("name")) }
         val shopping = objects(JSONArray(entries.getValue("shopping.json"))).map { ShoppingItem(id = it.getString("id"), name = it.getString("name"), note = it.getString("note"), bought = it.getBoolean("bought"), sortOrder = it.getInt("sortOrder"), createdAt = it.getLong("createdAt"), updatedAt = it.getLong("updatedAt"), sourceRecipeNames = it.optJSONArray("sourceRecipeNames")?.let { a -> (0 until a.length()).map { index -> a.getString(index) } }.orEmpty()) }
         val recipes = objects(JSONArray(entries.getValue("recipes.json"))).map { j ->
             val id = j.getString("id")
-            val recipe = Recipe(id, j.getString("name"), j.getString("description"), j.nullString("coverPath"), j.nullString("categoryId"), j.nullLong("prepareMinutes")?.let { require(it in 0..Int.MAX_VALUE); it.toInt() }, j.nullLong("cookMinutes")?.let { require(it in 0..Int.MAX_VALUE); it.toInt() }, j.getBoolean("favorite"), j.getBoolean("pinned"), j.nullLong("lastUsedAt"), j.getLong("createdAt"), j.getLong("updatedAt"), j.optString("preparation", ""), j.optInt("sortOrder", 0))
+            val recipe = Recipe(id, j.getString("name"), j.getString("description"), j.nullString("coverPath"), j.nullString("categoryId"), j.nullLong("prepareMinutes")?.let { require(it in 0..Int.MAX_VALUE); it.toInt() }, j.nullLong("cookMinutes")?.let { require(it in 0..Int.MAX_VALUE); it.toInt() }, j.getBoolean("favorite"), j.getBoolean("pinned"), j.nullLong("lastUsedAt"), j.getLong("createdAt"), j.getLong("updatedAt"), j.optString("preparation", ""), j.optInt("sortOrder", 0), j.nullLong("deletedAt"))
             val ingredients = objects(j.getJSONArray("ingredients")).map { RecipeIngredient(it.getString("id"), id, it.getString("name"), it.getString("amount"), it.getString("unit"), it.getString("amountNote"), it.getInt("sortOrder"), it.optBoolean("isSeasoning", false)) }
             val steps = objects(j.getJSONArray("steps")).map { RecipeStep(it.getString("id"), id, it.getString("content"), it.getString("heat"), it.nullLong("timerSeconds"), it.getInt("sortOrder")) }
             val tagIds = j.getJSONArray("tagIds"); require(tagIds.length() <= tags.size) { "标签关联无效" }

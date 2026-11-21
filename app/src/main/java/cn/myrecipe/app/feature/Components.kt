@@ -117,7 +117,7 @@ import kotlinx.coroutines.withContext
 
 @Composable fun RecipeShoppingSheet(vm: AppViewModel, ingredients: List<RecipeIngredient>, dismiss: () -> Unit, added: () -> Unit) {
     val choices = ingredients.distinctBy { cn.myrecipe.app.core.database.normalizeName(it.name) }
-    ChoiceSheet("选择要买的食材", choices.map { cn.myrecipe.app.core.database.normalizeName(it.name) to it.name }, choices.map { cn.myrecipe.app.core.database.normalizeName(it.name) }.toSet(), dismiss) { names ->
+    ChoiceSheet("选择要买的食材", choices.map { cn.myrecipe.app.core.database.normalizeName(it.name) to it.name }, ingredients.filterNot { it.isSeasoning }.map { cn.myrecipe.app.core.database.normalizeName(it.name) }.toSet(), dismiss) { names ->
         vm.addIngredients(ingredients.filter { cn.myrecipe.app.core.database.normalizeName(it.name) in names }, added)
     }
 }

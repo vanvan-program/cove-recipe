@@ -23,6 +23,7 @@ import cn.myrecipe.app.core.timer.remainingMillis
 import kotlinx.coroutines.delay
 
 @Composable fun RecipeApp(vm: AppViewModel, timerTarget: Pair<String, String>?, consumeTarget: () -> Unit) {
+    val updates: cn.myrecipe.app.core.update.VersionViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
     val nav = rememberNavController()
     val snapshot by vm.snapshot.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
@@ -53,6 +54,7 @@ import kotlinx.coroutines.delay
     Box(Modifier.fillMaxSize()) {
     Scaffold(modifier = Modifier.imePadding(), snackbarHost = { SnackbarHost(snackbar, Modifier.padding(bottom = if (route == "recipes") 110.dp else 0.dp)) }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
+            if (route == "recipes") JournalBinding()
             snapshot.timer?.let { timer ->
                 Surface(color = MaterialTheme.colorScheme.secondaryContainer, modifier = Modifier.fillMaxWidth()) {
                     Row(Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
@@ -71,10 +73,13 @@ import kotlinx.coroutines.delay
                         when (page) {
                             0 -> RecipesScreen(vm, snapshot, onOpen = { nav.navigate("detail/$it") }, onNew = { vm.openEditor(null); nav.navigate("editor/new") })
                             1 -> ShoppingScreen(vm, snapshot)
-                            2 -> SettingsScreen(vm, onTaxonomy = { nav.navigate("taxonomy") }, onRestored = { scope.launch { pager.scrollToPage(0) } })
+                            2 -> SettingsScreen(vm, onTaxonomy = { nav.navigate("taxonomy") }, onRestored = { scope.launch { pager.scrollToPage(0) } },
+                                onVersion = { nav.navigate("version") }, onTrash = { nav.navigate("trash") })
                         }
                     }
                 }
+                composable("version") { VersionScreen(updates) { nav.popBackStack() } }
+                composable("trash") { TrashScreen(vm, snapshot.trash) { nav.popBackStack() } }
                 composable("taxonomy") { TaxonomyScreen(vm, snapshot) { nav.popBackStack() } }
                 composable("detail/{id}") { back ->
                     val full = snapshot.recipes.find { it.recipe.id == back.arguments?.getString("id") }
@@ -103,10 +108,16 @@ import kotlinx.coroutines.delay
         modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp),
         shape = RoundedCornerShape(28.dp), color = MaterialTheme.colorScheme.surfaceContainerHigh, shadowElevation = 8.dp
     ) {
+        BoxWithConstraints {
+        val tabWidth = maxWidth / 3
+        val position = (pager.currentPage + pager.currentPageOffsetFraction).coerceIn(0f, 2f)
+        Surface(modifier = Modifier.align(Alignment.TopStart).offset(x = tabWidth * position + (tabWidth - 64.dp) / 2, y = 11.dp).width(64.dp).height(32.dp),
+            color = MaterialTheme.colorScheme.secondaryContainer, shape = RoundedCornerShape(16.dp)) { }
         NavigationBar(containerColor = androidx.compose.ui.graphics.Color.Transparent, windowInsets = WindowInsets(0, 0, 0, 0)) {
             listOf(Triple("菜谱", "recipes", Icons.Default.Home), Triple("购物清单", "shopping", Icons.Default.ShoppingCart), Triple("设置", "settings", Icons.Default.Settings)).forEachIndexed { index, (label, tag, icon) ->
-                NavigationBarItem(selected = pager.targetPage == index, onClick = { scope.launch { pager.animateScrollToPage(index) } }, modifier = Modifier.testTag("nav-$tag"), icon = { Icon(icon, null) }, label = { Text(label) })
+                NavigationBarItem(colors = NavigationBarItemDefaults.colors(indicatorColor = androidx.compose.ui.graphics.Color.Transparent), selected = pager.targetPage == index, onClick = { scope.launch { pager.animateScrollToPage(index) } }, modifier = Modifier.testTag("nav-$tag"), icon = { Icon(icon, null) }, label = { Text(label) })
             }
+        }
         }
     }
     }
