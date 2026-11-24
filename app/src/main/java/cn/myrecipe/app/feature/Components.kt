@@ -68,7 +68,7 @@ import kotlinx.coroutines.withContext
         }
     }
 }
-@Composable fun Cover(path: String?, images: ImageStore, modifier: Modifier = Modifier) {
+@Composable fun Cover(path: String?, images: ImageStore, modifier: Modifier = Modifier, photoPrint: Boolean = false) {
     val bitmap by produceState<ImageBitmap?>(null, path) {
         value = withContext(Dispatchers.IO) {
             path?.let { runCatching {
@@ -79,6 +79,13 @@ import kotlinx.coroutines.withContext
                 BitmapFactory.decodeFile(file.path, options)?.asImageBitmap()
             }.getOrNull() }
         }
+    }
+    if (photoPrint) {
+        bitmap?.let { photo ->
+            Image(photo, "菜谱封面", modifier.background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant).padding(5.dp), contentScale = ContentScale.Crop)
+        }
+        return
     }
     Box(modifier.clip(RoundedCornerShape(16.dp)).background(MaterialTheme.colorScheme.surfaceVariant), contentAlignment = Alignment.Center) {
         if (bitmap != null) Image(bitmap!!, "菜谱封面", Modifier.fillMaxSize(), contentScale = ContentScale.Crop)

@@ -64,6 +64,28 @@ class UiDeviceTest {
         compose.waitUntil(5000) { runBlocking { container.db.dao().shopping().single().bought } }
         compose.onNodeWithText("已买", useUnmergedTree = true).assertExists()
     }
+    @Test fun clearingShoppingUpdatesCountsWithoutBottomNotice() {
+        runBlocking {
+            container.repository.saveItem(ShoppingItem(name = "菜心"))
+            container.repository.saveItem(ShoppingItem(name = "藕片", bought = true))
+        }
+        compose.onNodeWithTag("nav-shopping").performClick()
+        fun expectCounts(pending: Int, bought: Int) {
+            val summary = "待买 ${pending} 项 · 已买 ${bought} 项"
+            compose.waitUntil(5000) { compose.onAllNodesWithText(summary).fetchSemanticsNodes().isNotEmpty() }
+            compose.onNodeWithTag("appSnackbar").assertDoesNotExist()
+        }
+        compose.onNodeWithText("清理已买").performScrollTo().performClick()
+        expectCounts(1, 0)
+        compose.onNodeWithContentDescription("删除菜心").performClick()
+        expectCounts(0, 0)
+        compose.onNodeWithTag("undoShoppingDelete").assertIsDisplayed().performClick()
+        expectCounts(1, 0)
+        compose.onNodeWithText("清空").performClick()
+        compose.onNodeWithText("确认").performClick()
+        expectCounts(0, 0)
+        compose.onNodeWithTag("undoShoppingDelete").assertDoesNotExist()
+    }
     @Test fun kitchenNavigationKeepsScreenAwakeThenRestores() {
         val full = seed(); compose.waitUntil(5000) { compose.onAllNodesWithText(full.recipe.name).fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithText(full.recipe.name).performClick(); compose.onNodeWithText("开始做饭").performClick()

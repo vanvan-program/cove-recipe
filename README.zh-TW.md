@@ -11,7 +11,7 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21%20%7C%20Compose%20%7C%20Room-7F52FF?style=flat-square)](#技術棧與專案結構)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-[下載 v1.5.1 APK](https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.1/CoveRecipe-1.5.1.apk) · [加速下載（GHFast）](https://ghfast.top/https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.1/CoveRecipe-1.5.1.apk) · [版本說明與 SHA-256 校驗檔](https://github.com/vanvan-program/cove-recipe/releases/tag/v1.5.1)
+[下載 v1.5.2 APK](https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.2/CoveRecipe-1.5.2.apk) · [加速下載（GHFast）](https://ghfast.top/https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.2/CoveRecipe-1.5.2.apk) · [版本說明與 SHA-256 校驗檔](https://github.com/vanvan-program/cove-recipe/releases/tag/v1.5.2)
 
 [更新日誌](CHANGELOG.md) · [第三方元件說明](THIRD_PARTY_NOTICES.md) · [問題回報](https://github.com/vanvan-program/cove-recipe/issues)
 
@@ -23,23 +23,23 @@
 
 Cove Recipe 是一款中文 Android 個人食譜本，支援 Android 8.0（API 26）以上版本。App 無廣告，使用時無須註冊帳號。食譜、照片和採買清單只保存在手機上，離線也能記錄食譜、跟著步驟做菜。手動檢查更新或下載新版時才會連線。
 
-## v1.5.1 更新
+## v1.5.2 更新
 
-- 左上角恢復稻穗，皮革、縫線和暖白紙紋延伸至四周，右側可見三層書頁，狀態列沿用封面底色。
-- 食譜、採買清單和設定固定在頁底。新增按鈕移到清單上方。
-- 修正 GitHub 介面無法連線時的版本檢查，備用線路會直接讀取版本清單。
+- 封面換成淺駝棕皮革，底部選中的頁籤改為暖褐色。滑動時整張紙微微傾斜，移出或蓋回。
+- 新增食譜與新增食材採用貼紙按鈕，「從食譜新增」採用相紙按鈕，設定分為四張便利貼。
+- 批次清理後直接更新清單與數量。刪除單項食材後，可在數量旁復原。
 
 ## 介面預覽
 
-以下畫面取自已發布的 v1.5.1 APK，在 Android 15 模擬器上以範例食譜擷取。
+以下為 v1.5.2 在 Android 16 模擬器上的畫面，使用範例食譜。也可下載後開啟[互動預覽 HTML](ui-preview/cove-recipe-notebook.html)。
 
 | 食譜首頁 | 食譜詳情 | 採買清單 |
 | :---: | :---: | :---: |
-| <a href="docs/screenshots/151-home.webp"><img src="docs/screenshots/151-home.webp" width="230" alt="置頂食譜與備料、烹調時間" /></a> | <a href="docs/screenshots/151-detail.webp"><img src="docs/screenshots/151-detail.webp" width="230" alt="番茄炒蛋的食材與備料說明" /></a> | <a href="docs/screenshots/151-shopping.webp"><img src="docs/screenshots/151-shopping.webp" width="230" alt="採買項目及其來源食譜" /></a> |
+| <a href="docs/screenshots/152-home.webp"><img src="docs/screenshots/152-home.webp" width="230" alt="食譜首頁" /></a> | <a href="docs/screenshots/152-detail.webp"><img src="docs/screenshots/152-detail.webp" width="230" alt="食譜詳情" /></a> | <a href="docs/screenshots/152-shopping.webp"><img src="docs/screenshots/152-shopping.webp" width="230" alt="採買清單" /></a> |
 
-| 排序選單 | 資源回收筒 | 關於版本與下載來源 |
+| 設定 | 設定下半頁 | 關於版本 |
 | :---: | :---: | :---: |
-| <a href="docs/screenshots/151-sort.webp"><img src="docs/screenshots/151-sort.webp" width="230" alt="首頁可選的食譜排序方式" /></a> | <a href="docs/screenshots/151-trash.webp"><img src="docs/screenshots/151-trash.webp" width="230" alt="資源回收筒中的食譜與還原按鈕" /></a> | <a href="docs/screenshots/151-about.webp"><img src="docs/screenshots/151-about.webp" width="230" alt="已安裝的 v1.5.1 與下載來源設定" /></a> |
+| <a href="docs/screenshots/152-settings.webp"><img src="docs/screenshots/152-settings.webp" width="230" alt="設定" /></a> | <a href="docs/screenshots/152-settings-bottom.webp"><img src="docs/screenshots/152-settings-bottom.webp" width="230" alt="設定下半頁" /></a> | <a href="docs/screenshots/152-about.webp"><img src="docs/screenshots/152-about.webp" width="230" alt="關於版本" /></a> |
 
 ## 核心功能
 

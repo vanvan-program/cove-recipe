@@ -73,6 +73,7 @@ internal fun openInstaller(context: Context, apk: File): Boolean {
             }
             TextButton(onClick = { history = !history }) { Text("版本更新目录") }
             if (history) {
+                Text("1.5.2　浅棕皮革封面、褐色页签和整页平移切换，新增贴纸按钮与设置便利贴。")
                 Text("1.5.1　恢复皮革封面、纸纹和固定页签，修复备用线路检查更新。")
                 Text("1.5.0　菜谱排序与回收站、步骤滚轮、购物勾选和应用内更新。")
                 Text("1.4.0　菜谱拖动排序、调料和购物来源。")

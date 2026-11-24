@@ -65,9 +65,37 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
         val restored = container.repository.addNames(ingredients.map { it.name }, sources)
         notices.send(Notice(if (restored > 0) "已加入清单，其中 $restored 项恢复为待买" else "已加入购物清单，同名食材已去重"))
     }
+    var deletedShoppingItem by mutableStateOf<ShoppingItem?>(null)
+        private set
+    private var undoExpiry: Job? = null
+
+    private fun discardShoppingUndo() {
+        undoExpiry?.cancel()
+        undoExpiry = null
+        deletedShoppingItem = null
+    }
+
     fun deleteShopping(item: ShoppingItem) = run {
         container.repository.deleteItem(item.id)
-        notices.send(Notice("已删除 ${item.name}") { container.repository.restoreItem(item) })
+        discardShoppingUndo()
+        deletedShoppingItem = item
+        undoExpiry = viewModelScope.launch {
+            delay(7_000)
+            deletedShoppingItem = null
+        }
+    }
+
+    fun undoShoppingDelete() {
+        val item = deletedShoppingItem ?: return
+        run {
+            container.repository.restoreItem(item)
+            if (deletedShoppingItem === item) discardShoppingUndo()
+        }
+    }
+
+    fun clearShopping(onlyBought: Boolean) = run {
+        container.repository.clearShopping(onlyBought)
+        discardShoppingUndo()
     }
     fun image(uri: Uri) = run {
         busy = true
@@ -79,6 +107,6 @@ class AppViewModel(val container: AppContainer) : ViewModel() {
     }
     fun restore(uri: Uri, success: () -> Unit) = run {
         busy = true
-        try { val count = container.backup.restore(uri); clearEditor(); success(); notices.send(Notice("已恢复 $count 道菜谱及购物清单")) } finally { busy = false }
+        try { val count = container.backup.restore(uri); discardShoppingUndo(); clearEditor(); success(); notices.send(Notice("已恢复 $count 道菜谱及购物清单")) } finally { busy = false }
     }
 }

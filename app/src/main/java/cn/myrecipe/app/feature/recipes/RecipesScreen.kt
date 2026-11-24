@@ -5,11 +5,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.foundation.background
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.testTag
@@ -75,35 +76,46 @@ import cn.myrecipe.app.core.database.*
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             listOf("全部", "收藏", "最近使用").forEach { item ->
                 FilterChip(selected = mode == item, onClick = { vm.run { vm.container.preferences.saveHome(item, category) } },
-                    label = { Text(item) }, shape = RoundedCornerShape(4.dp))
+                    label = { Text(item) }, shape = RoundedCornerShape(4.dp),
+                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = journalLeaf,
+                        selectedLabelColor = Color(0xfffff6de)))
             }
             TextButton(onClick = { categorySheet = true }) { Text(if (category == null) "全部分类 ▾" else "${categoryPath(category, snapshot.categories)} ▾") }
         }
         if (!selecting) Row(Modifier.fillMaxWidth().padding(horizontal = 14.dp),
             horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Text("${recipes.size} 道菜谱", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary)
-            TextButton(onClick = onNew, modifier = Modifier.testTag("newRecipe")) {
-                Icon(Icons.Default.Add, null, Modifier.size(17.dp))
-                Text("新建菜谱")
-            }
+            StickerAction("新建菜谱", onNew, Modifier.testTag("newRecipe"))
         }
         if (selecting) Button(onClick = { ingredientsSheet = snapshot.recipes.filter { it.recipe.id in selected }.flatMap { it.ingredients } }, enabled = selected.isNotEmpty(), modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth()) { Text("将选中的 ${selected.size} 道菜加入购物清单") }
         LazyColumn(Modifier.weight(1f).then(dragModifier).testTag("recipeList"), state = drag.listState, contentPadding = PaddingValues(start = 14.dp, end = 14.dp, top = 2.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (recipes.isEmpty()) item { EmptyState(if (snapshot.recipes.isEmpty()) "自己的菜谱，从第一道开始" else "没有找到菜谱", if (snapshot.recipes.isEmpty()) "点「新建菜谱」，记下家里的拿手菜。" else "试试其他关键词或分类。") }
             items(orderedRecipes, key = { it.recipe.id }) { full ->
-                Card(onClick = { if (selecting) selected = if (full.recipe.id in selected) selected - full.recipe.id else selected + full.recipe.id else onOpen(full.recipe.id) }, modifier = Modifier.fillMaxWidth().testTag("recipe-${full.recipe.id}").then(if (!draggable) Modifier else Modifier.recipeDragItem(drag, full.recipe.id, recipes, saveOrder)), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.70f)), border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.42f)), shape = RoundedCornerShape(4.dp)) {
-                    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), verticalAlignment = Alignment.CenterVertically) {
-                        Spacer(Modifier.width(4.dp).fillMaxHeight().background(if (full.recipe.pinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer))
-                        if (selecting) Checkbox(full.recipe.id in selected, null)
-                        Column(Modifier.weight(1f).padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(categoryPath(full.recipe.categoryId, snapshot.categories), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(full.recipe.name + if (full.recipe.pinned) " · 置顶" else "", style = MaterialTheme.typography.titleLarge)
-                            val times = listOfNotNull(full.recipe.prepareMinutes?.let { "准备 ${it}分" }, full.recipe.cookMinutes?.let { "烹饪 ${it}分" })
+                val recipe = full.recipe
+                val isSelected = selecting && recipe.id in selected
+                val row = Modifier.fillMaxWidth().testTag("recipe-${recipe.id}").then(
+                    if (draggable) Modifier.recipeDragItem(drag, recipe.id, recipes, saveOrder) else Modifier
+                ).background(if (isSelected) Color(0x33576745) else Color.Transparent).clickable {
+                    if (selecting) selected = if (isSelected) selected - recipe.id else selected + recipe.id
+                    else onOpen(recipe.id)
+                }
+                Column(row) {
+                    recipe.coverPath?.let { path ->
+                        Cover(path, vm.container.images, Modifier.fillMaxWidth().height(148.dp), photoPrint = true)
+                    }
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 3.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically) {
+                        if (selecting) Checkbox(isSelected, null)
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(categoryPath(recipe.categoryId, snapshot.categories), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(recipe.name + if (recipe.pinned) " · 置顶" else "", style = MaterialTheme.typography.titleLarge, fontFamily = FontFamily.Serif)
+                            val times = listOfNotNull(recipe.prepareMinutes?.let { "准备 ${it}分" }, recipe.cookMinutes?.let { "烹饪 ${it}分" })
                             if (times.isNotEmpty()) Text(times.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             if (full.tags.isNotEmpty()) Text(full.tags.joinToString("  ") { "#${it.name}" }, maxLines = 2, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary)
                         }
-                        if (full.recipe.favorite) Text("★", Modifier.padding(end = 12.dp), color = MaterialTheme.colorScheme.primary)
+                        if (recipe.favorite) Text("★", Modifier.padding(horizontal = 6.dp), color = MaterialTheme.colorScheme.primary)
                     }
+                    HorizontalDivider(color = Color(0xffc4b393))
                 }
             }
         }

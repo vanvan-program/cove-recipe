@@ -1,12 +1,8 @@
 package cn.myrecipe.app.feature
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.testTag
-import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -29,8 +25,7 @@ import kotlinx.coroutines.delay
     val snackbar = remember { SnackbarHostState() }
     val entry by nav.currentBackStackEntryAsState()
     val route = entry?.destination?.route ?: "recipes"
-    val pager = rememberPagerState(pageCount = { 3 })
-    val scope = rememberCoroutineScope()
+    val sheets = rememberJournalSheets()
     var now by remember { mutableLongStateOf(android.os.SystemClock.elapsedRealtime()) }
     LaunchedEffect(snapshot.timer) { if (snapshot.timer?.state == "RUNNING") while (true) { now = android.os.SystemClock.elapsedRealtime(); delay(1000) } }
     val lifecycle = LocalLifecycleOwner.current
@@ -53,7 +48,11 @@ import kotlinx.coroutines.delay
     }
     JournalBook {
         Scaffold(containerColor = Color.Transparent, contentWindowInsets = WindowInsets(0, 0, 0, 0),
-            snackbarHost = { SnackbarHost(snackbar) }) { padding ->
+            snackbarHost = {
+                SnackbarHost(snackbar) { data ->
+                    Snackbar(snackbarData = data, modifier = Modifier.testTag("appSnackbar"))
+                }
+            }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             snapshot.timer?.let { timer ->
                 Surface(color = MaterialTheme.colorScheme.secondaryContainer, modifier = Modifier.fillMaxWidth()) {
@@ -69,11 +68,11 @@ import kotlinx.coroutines.delay
             if (vm.busy) LinearProgressIndicator(Modifier.fillMaxWidth())
             NavHost(nav, startDestination = "recipes", modifier = Modifier.weight(1f)) {
                 composable("recipes") {
-                    HorizontalPager(state = pager, modifier = Modifier.fillMaxSize().testTag("mainPager"), beyondViewportPageCount = 1) { page ->
+                    JournalSheetDeck(sheets) { page ->
                         when (page) {
                             0 -> RecipesScreen(vm, snapshot, onOpen = { nav.navigate("detail/$it") }, onNew = { vm.openEditor(null); nav.navigate("editor/new") })
                             1 -> ShoppingScreen(vm, snapshot)
-                            2 -> SettingsScreen(vm, onTaxonomy = { nav.navigate("taxonomy") }, onRestored = { scope.launch { pager.scrollToPage(0) } },
+                            2 -> SettingsScreen(vm, onTaxonomy = { nav.navigate("taxonomy") }, onRestored = { sheets.snapTo(0) },
                                 onVersion = { nav.navigate("version") }, onTrash = { nav.navigate("trash") })
                         }
                     }
@@ -103,9 +102,7 @@ import kotlinx.coroutines.delay
                 }
             }
             if (route == "recipes") {
-                JournalTabs(pager.currentPage, (pager.currentPage + pager.currentPageOffsetFraction).coerceIn(0f, 2f)) {
-                    scope.launch { pager.animateScrollToPage(it) }
-                }
+                JournalTabs(sheets.selected, sheets::select)
             }
         }
         }

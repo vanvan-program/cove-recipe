@@ -6,12 +6,12 @@ param(
     [switch]$PromptPassword
 )
 $ErrorActionPreference = "Stop"
-$unsignedApk = Join-Path $PSScriptRoot "CoveRecipe-1.5.1-unsigned.apk"
-$finalApk = Join-Path $PSScriptRoot "CoveRecipe-1.5.1.apk"
+$unsignedApk = Join-Path $PSScriptRoot "CoveRecipe-1.5.2-unsigned.apk"
+$finalApk = Join-Path $PSScriptRoot "CoveRecipe-1.5.2.apk"
 $expectedCert = "76013fa323f763be8c7caa569dee23dfd27ab1af745fa0dd064c8b64f2f06385"
 $hashFile = Join-Path $PSScriptRoot "SHA256SUMS.txt"
 $hashRecord = [string](Get-Content -LiteralPath $hashFile -TotalCount 1)
-if ($hashRecord -notmatch '^([A-Fa-f0-9]{64})\s+\*?CoveRecipe-1\.5\.1-unsigned\.apk$') {
+if ($hashRecord -notmatch '^([A-Fa-f0-9]{64})\s+\*?CoveRecipe-1\.5\.2-unsigned\.apk$') {
     throw "Unexpected checksum file. Extract all files from the build artifact together."
 }
 $expectedApkHash = $Matches[1]

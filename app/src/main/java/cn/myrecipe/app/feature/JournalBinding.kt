@@ -2,15 +2,22 @@ package cn.myrecipe.app.feature
 
 import android.graphics.Bitmap
 import android.graphics.BitmapShader
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Matrix
 import android.graphics.Shader
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,49 +33,51 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
-import kotlin.random.Random
+import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.text.font.FontWeight
+import cn.myrecipe.app.R
 
-private val thread = Color(0xffd8b580)
+private val thread = Color(0xffe8c68e)
 private val rule = Color(0xffc7ae85)
-private val ink = Color(0xff51331f)
+internal val journalInk = Color(0xff412a1b)
+internal val journalLeaf = Color(0xff47563d)
 private val pageShape = RoundedCornerShape(4.dp, 8.dp, 8.dp, 4.dp)
+private val LocalSheetTexture = staticCompositionLocalOf<Bitmap?> { null }
 
-private fun grain(leather: Boolean): Bitmap {
-    val random = Random(if (leather) 421 else 817)
-    val tile = Bitmap.createBitmap(160, 160, Bitmap.Config.ARGB_8888)
-    val pixels = IntArray(160 * 160) {
-        val light = random.nextBoolean()
-        android.graphics.Color.argb(random.nextInt(if (leather) 46 else 24),
-            if (light) 255 else 74, if (light) 240 else 44, if (light) 201 else 17)
+private fun Modifier.texture(bitmap: Bitmap?, leather: Boolean = false) = drawWithCache {
+    val base = if (leather) Color(0xffb28255) else Color(0xfff6edd8)
+    val paint = android.graphics.Paint(android.graphics.Paint.FILTER_BITMAP_FLAG)
+    if (bitmap != null) {
+        val tileWidth = (if (leather) 260.dp else 290.dp).toPx()
+        paint.shader = BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT).apply {
+            val scale = tileWidth / bitmap.width
+            setLocalMatrix(Matrix().apply { setScale(scale, scale) })
+        }
+        if (leather) {
+            // Re-tone the original leather grain to the honey-tan cover.
+            paint.colorFilter = ColorMatrixColorFilter(floatArrayOf(
+                .20f, .53f, .07f, 0f, 143f,
+                .20f, .53f, .07f, 0f, 95f,
+                .20f, .53f, .07f, 0f, 50f,
+                0f, 0f, 0f, 1f, 0f
+            ))
+        } else {
+            paint.alpha = 160
+        }
     }
-    tile.setPixels(pixels, 0, 160, 0, 0, 160, 160)
-    val canvas = android.graphics.Canvas(tile)
-    val pen = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
-    repeat(if (leather) 640 else 190) {
-        val x = random.nextInt(160).toFloat()
-        val y = random.nextInt(160).toFloat()
-        pen.color = if (leather) 0x35553622 else 0x247d633e
-        pen.strokeWidth = if (leather) 1.6f else 0.8f
-        canvas.drawLine(x, y, x + random.nextInt(2, 9), y + random.nextInt(-3, 4), pen)
-    }
-    return tile
-}
-
-private val hideGrain by lazy { grain(true) }
-private val paperGrain by lazy { grain(false) }
-private fun Modifier.material(leather: Boolean) = drawWithCache {
-    val colors = if (leather) listOf(Color(0xff40281d), Color(0xff825237), Color(0xff5d3827), Color(0xff42291f))
-        else listOf(Color(0xffe6d5b6), Color(0xfffbf2de), Color(0xfffff8e7), Color(0xfff4e5ca))
-    val base = if (leather) Brush.linearGradient(colors) else Brush.horizontalGradient(
-        0f to colors[0], 0.03f to colors[1], 0.58f to colors[2], 1f to colors[3])
-    val texture = android.graphics.Paint().apply {
-        shader = BitmapShader(if (leather) hideGrain else paperGrain, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT)
-    }
+    val edge = if (leather) Brush.horizontalGradient(
+        0f to Color(0x5560442e), .025f to Color(0x22f8d6a2), .043f to Color(0x44513c29),
+        .065f to Color.Transparent, .94f to Color.Transparent, 1f to Color(0x505c3c26)
+    ) else Brush.horizontalGradient(0f to Color(0x3387673f), .045f to Color.Transparent,
+        .95f to Color.Transparent, 1f to Color(0x1887673f))
     onDrawBehind {
         drawRect(base)
-        drawIntoCanvas { it.nativeCanvas.drawRect(0f, 0f, size.width, size.height, texture) }
+        if (bitmap != null) drawIntoCanvas { it.nativeCanvas.drawRect(0f, 0f, size.width, size.height, paint) }
+        drawRect(edge)
     }
 }
+
+@Composable internal fun Modifier.journalPaper(): Modifier = texture(LocalSheetTexture.current)
 
 private fun Modifier.seam() = drawWithCache {
     val inset = 4.dp.toPx()
@@ -89,7 +98,7 @@ private fun Modifier.seam() = drawWithCache {
             moveTo(unit * 6, unit * 37)
             cubicTo(unit * 15, unit * 29, unit * 18, unit * 6, unit * 34, unit * 6)
         }
-        drawPath(stem, thread, style = Stroke(width = 1.4f * unit, cap = StrokeCap.Round))
+        drawPath(stem, journalInk, style = Stroke(width = 1.4f * unit, cap = StrokeCap.Round))
         fun grain(x: Float, y: Float, dx: Float, dy: Float) {
             val path = Path().apply {
                 moveTo(x * unit, y * unit)
@@ -97,8 +106,8 @@ private fun Modifier.seam() = drawWithCache {
                 quadraticTo((x + dx * 0.48f + dy * 0.31f) * unit, (y + dy * 0.48f - dx * 0.31f) * unit, x * unit, y * unit)
                 close()
             }
-            drawPath(path, Color(0xffe9c782))
-            drawLine(thread, p(x + dx, y + dy), p(x + dx * 1.22f, y + dy * 1.22f), unit * 0.65f)
+            drawPath(path, Color(0xff704828))
+            drawLine(journalInk, p(x + dx, y + dy), p(x + dx * 1.22f, y + dy * 1.22f), unit * 0.65f)
         }
         grain(12f, 29f, -5f, -10f)
         grain(15f, 24f, 9f, -3f)
@@ -111,41 +120,88 @@ private fun Modifier.seam() = drawWithCache {
 }
 
 @Composable internal fun JournalBook(content: @Composable () -> Unit) {
-    Box(Modifier.fillMaxSize().material(true).windowInsetsPadding(WindowInsets.safeDrawing).imePadding()) {
-        Column(Modifier.fillMaxSize().seam().padding(start = 11.dp, end = 11.dp, bottom = 11.dp, top = 5.dp)) {
-            Row(Modifier.fillMaxWidth().padding(start = 7.dp, top = 2.dp, bottom = 3.dp),
-                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                RiceSprig()
-                Text("Cove Recipe", color = Color(0xffffe5b5), fontFamily = FontFamily.Serif,
-                    fontStyle = FontStyle.Italic, style = MaterialTheme.typography.titleLarge)
-            }
-            Box(Modifier.weight(1f).fillMaxWidth()) {
-                listOf(Color(0xffb29872), Color(0xffe5d4b1), Color(0xffc3aa83)).forEachIndexed { index, color ->
-                    Box(Modifier.matchParentSize().padding(start = 4.dp, end = (index * 2).dp, top = (4 - index).dp, bottom = index.dp)
-                        .clip(pageShape).background(color))
+    val paper = ImageBitmap.imageResource(R.drawable.journal_paper).asAndroidBitmap()
+    val leather = ImageBitmap.imageResource(R.drawable.journal_leather).asAndroidBitmap()
+    CompositionLocalProvider(LocalSheetTexture provides paper) {
+        Box(Modifier.fillMaxSize().texture(leather, leather = true).windowInsetsPadding(WindowInsets.safeDrawing).imePadding()) {
+            Column(Modifier.fillMaxSize().seam().padding(start = 11.dp, end = 11.dp, bottom = 11.dp, top = 5.dp)) {
+                Row(Modifier.fillMaxWidth().heightIn(min = 45.dp).padding(start = 7.dp, top = 2.dp, bottom = 3.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+                    RiceSprig()
+                    Text("Cove Recipe", color = journalInk, fontFamily = FontFamily.Serif,
+                        fontStyle = FontStyle.Italic, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.headlineSmall)
                 }
-                Box(Modifier.matchParentSize().padding(end = 7.dp, bottom = 3.dp).clip(pageShape).material(false)) {
-                    content()
+                Box(Modifier.weight(1f).fillMaxWidth()) {
+                    listOf(Color(0xffb29872), Color(0xffe5d4b1), Color(0xffc3aa83)).forEachIndexed { index, color ->
+                        Box(Modifier.matchParentSize().padding(start = 4.dp, end = (index * 2).dp, top = (4 - index).dp, bottom = index.dp)
+                            .clip(pageShape).background(color))
+                    }
+                    Box(Modifier.matchParentSize().padding(end = 7.dp, bottom = 3.dp).clip(pageShape).journalPaper()) {
+                        content()
+                    }
+                    BindingRings(Modifier.align(Alignment.CenterStart).offset(x = (-6).dp)
+                        .width(14.dp).fillMaxHeight(.85f))
                 }
             }
         }
     }
 }
 
-@Composable internal fun JournalTabs(selected: Int, position: Float, select: (Int) -> Unit) {
-    BoxWithConstraints(Modifier.fillMaxWidth().background(Color(0xaaf0dfc0))) {
-        val width = maxWidth / 3
+@Composable private fun BindingRings(modifier: Modifier) {
+    Canvas(modifier) {
+        val ringHeight = 4.dp.toPx()
+        for (fraction in listOf(.12f, .5f, .88f)) {
+            val y = size.height * fraction
+            val eyelet = Offset(size.width - 2.dp.toPx(), y + ringHeight / 2)
+            drawCircle(Color(0xff715838), 3.3.dp.toPx(), eyelet)
+            val strip = Brush.verticalGradient(
+                listOf(Color(0xff725b3a), Color(0xffefdbac), Color(0xffbfa575), Color(0xff796341)),
+                startY = y, endY = y + ringHeight
+            )
+            drawRoundRect(strip, Offset(0f,y), Size(size.width,ringHeight), CornerRadius(ringHeight / 2))
+        }
+    }
+}
+
+@Composable internal fun JournalTabs(selected: Int, select: (Int) -> Unit) {
+    val shape = RoundedCornerShape(5.dp, 6.dp, 3.dp, 3.dp)
+    Column(Modifier.fillMaxWidth().background(Color(0xffeee0c5))) {
         HorizontalDivider(color = rule)
-        Row(Modifier.fillMaxWidth().selectableGroup()) {
+        Row(Modifier.fillMaxWidth().selectableGroup().padding(horizontal = 6.dp, vertical = 3.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             listOf("菜谱" to "recipes", "购物清单" to "shopping", "设置" to "settings").forEachIndexed { i, (label, tag) ->
-                Box(Modifier.weight(1f).heightIn(min = 48.dp).testTag("nav-$tag")
-                    .selectable(selected = selected == i, role = Role.Tab, onClick = { select(i) }),
-                    contentAlignment = Alignment.Center) {
-                    if (i > 0) VerticalDivider(Modifier.align(Alignment.CenterStart).height(17.dp), color = rule)
-                    Text(label, color = if (i == selected) ink else Color(0xff705d46), style = MaterialTheme.typography.labelLarge)
+                val active = i == selected
+                val foreground = if (active) Color(0xfffff4df) else Color(0xff66583e)
+                val fill = if (active) Modifier.background(Color(0xff805538), shape)
+                    .border(1.dp, Color(0xff9a7251), shape) else Modifier
+                Row(Modifier.weight(1f).heightIn(min = 48.dp).testTag("nav-$tag").clip(shape).then(fill)
+                    .selectable(selected = active, role = Role.Tab, onClick = { select(i) }),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    if (i == 2) Icon(Icons.Outlined.Settings, null, Modifier.size(16.dp), tint = foreground)
+                    else TabGlyph(i == 0, foreground)
+                    Text(label, color = foreground, style = MaterialTheme.typography.labelLarge)
                 }
             }
         }
-        Box(Modifier.offset(x = width * position).width(width).height(3.dp).background(ink))
+    }
+}
+
+@Composable private fun TabGlyph(book: Boolean, color: Color) {
+    Canvas(Modifier.size(16.dp)) {
+        val u = size.width / 16
+        val line = Stroke(1.35f * u, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        if (book) {
+            val pages = Path().apply {
+                moveTo(u, 3*u); quadraticTo(4*u, 2*u, 8*u, 4*u)
+                quadraticTo(12*u, 2*u, 15*u, 3*u); lineTo(15*u, 13*u)
+                quadraticTo(11*u, 12*u, 8*u, 14*u); quadraticTo(5*u,12*u,u,13*u); close()
+            }
+            drawPath(pages,color,style=line)
+            drawLine(color,Offset(8*u,4*u),Offset(8*u,14*u),line.width)
+        } else {
+            drawRoundRect(color,Offset(2*u,5*u),Size(12*u,9*u),CornerRadius(u),style=line)
+            drawArc(color,180f,180f,false,Offset(5*u,u),Size(6*u,8*u),style=line)
+        }
     }
 }

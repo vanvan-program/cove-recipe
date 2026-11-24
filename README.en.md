@@ -11,7 +11,7 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21%20%7C%20Compose%20%7C%20Room-7F52FF?style=flat-square)](#tech-stack--project-structure)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-[Download v1.5.1 APK](https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.1/CoveRecipe-1.5.1.apk) · [GHFast mirror](https://ghfast.top/https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.1/CoveRecipe-1.5.1.apk) · [Release notes and SHA-256 checksum](https://github.com/vanvan-program/cove-recipe/releases/tag/v1.5.1)
+[Download v1.5.2 APK](https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.2/CoveRecipe-1.5.2.apk) · [GHFast mirror](https://ghfast.top/https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.2/CoveRecipe-1.5.2.apk) · [Release notes and SHA-256 checksum](https://github.com/vanvan-program/cove-recipe/releases/tag/v1.5.2)
 
 [Changelog](CHANGELOG.md) · [Third-Party Notices](THIRD_PARTY_NOTICES.md) · [Issues](https://github.com/vanvan-program/cove-recipe/issues)
 
@@ -23,23 +23,23 @@
 
 Cove Recipe is a Chinese-language personal cookbook for Android 8.0 (API 26) and later. There are no ads or accounts. Recipes, photos, and shopping lists stay on your phone. You can record recipes and cook offline. The app connects to the internet when you check for updates or download a new version.
 
-## What’s new in v1.5.1
+## What’s new in v1.5.2
 
-- The rice sprig, stitched leather cover, textured paper and three layered page edges now frame the whole app. The status bar takes on the cover color.
-- Recipes, Shopping and Settings are fixed tabs at the foot of the page. Add actions sit above the lists.
-- Update checks can read the release manifest through alternate routes if the GitHub API is unavailable.
+- The cover uses lighter tan leather, with a warm brown highlight for the selected tab. A swipe slides the whole sheet out or back into place with a slight tilt.
+- Add buttons look like stickers, the recipe picker uses a photo-print button, and Settings has four sticky notes.
+- Bulk clearing updates the shopping list and counts immediately. Undo for an individual deletion appears next to the item count.
 
 ## Screenshots
 
-Captured from the published v1.5.1 APK on an Android 15 emulator using sample recipes.
+Captured from v1.5.2 on an Android 16 emulator with sample recipes. You can also download and open the [interactive HTML preview](ui-preview/cove-recipe-notebook.html).
 
 | Recipe list | Recipe details | Shopping list |
 | :---: | :---: | :---: |
-| <a href="docs/screenshots/151-home.webp"><img src="docs/screenshots/151-home.webp" width="230" alt="Pinned recipes with preparation and cooking times" /></a> | <a href="docs/screenshots/151-detail.webp"><img src="docs/screenshots/151-detail.webp" width="230" alt="Tomato and egg stir-fry with its ingredients and preparation notes" /></a> | <a href="docs/screenshots/151-shopping.webp"><img src="docs/screenshots/151-shopping.webp" width="230" alt="Shopping items and the recipes they came from" /></a> |
+| <a href="docs/screenshots/152-home.webp"><img src="docs/screenshots/152-home.webp" width="230" alt="Recipe list" /></a> | <a href="docs/screenshots/152-detail.webp"><img src="docs/screenshots/152-detail.webp" width="230" alt="Recipe details" /></a> | <a href="docs/screenshots/152-shopping.webp"><img src="docs/screenshots/152-shopping.webp" width="230" alt="Shopping list" /></a> |
 
-| Sort menu | Recycle bin | Version and downloads |
+| Settings | More settings | About |
 | :---: | :---: | :---: |
-| <a href="docs/screenshots/151-sort.webp"><img src="docs/screenshots/151-sort.webp" width="230" alt="Sort options on the recipe list" /></a> | <a href="docs/screenshots/151-trash.webp"><img src="docs/screenshots/151-trash.webp" width="230" alt="Deleted recipes and their restore buttons" /></a> | <a href="docs/screenshots/151-about.webp"><img src="docs/screenshots/151-about.webp" width="230" alt="Installed version v1.5.1 and download source settings" /></a> |
+| <a href="docs/screenshots/152-settings.webp"><img src="docs/screenshots/152-settings.webp" width="230" alt="Settings" /></a> | <a href="docs/screenshots/152-settings-bottom.webp"><img src="docs/screenshots/152-settings-bottom.webp" width="230" alt="More settings" /></a> | <a href="docs/screenshots/152-about.webp"><img src="docs/screenshots/152-about.webp" width="230" alt="About" /></a> |
 
 ## Key Features
 

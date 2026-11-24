@@ -25,5 +25,5 @@ if ($DeviceTests) {
 }
 $taskDist = Join-Path $taskRoot 'dist'
 New-Item -ItemType Directory -Force $taskDist | Out-Null
-Copy-Item -LiteralPath (Join-Path $taskRoot 'app\build\outputs\apk\debug\app-debug.apk') -Destination (Join-Path $taskDist 'CoveRecipe-1.5.1.apk') -Force
-Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $taskDist 'CoveRecipe-1.5.1.apk') | Format-List
+Copy-Item -LiteralPath (Join-Path $taskRoot 'app\build\outputs\apk\debug\app-debug.apk') -Destination (Join-Path $taskDist 'CoveRecipe-1.5.2.apk') -Force
+Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $taskDist 'CoveRecipe-1.5.2.apk') | Format-List

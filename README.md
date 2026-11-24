@@ -11,7 +11,7 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21%20%7C%20Compose%20%7C%20Room-7F52FF?style=flat-square)](#技术栈与工程结构)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-[下载 v1.5.1 APK](https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.1/CoveRecipe-1.5.1.apk) · [国内加速下载（GHFast）](https://ghfast.top/https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.1/CoveRecipe-1.5.1.apk) · [发布说明与 SHA-256 校验文件](https://github.com/vanvan-program/cove-recipe/releases/tag/v1.5.1)
+[下载 v1.5.2 APK](https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.2/CoveRecipe-1.5.2.apk) · [国内加速下载（GHFast）](https://ghfast.top/https://github.com/vanvan-program/cove-recipe/releases/download/v1.5.2/CoveRecipe-1.5.2.apk) · [发布说明与 SHA-256 校验文件](https://github.com/vanvan-program/cove-recipe/releases/tag/v1.5.2)
 
 [更新日志](CHANGELOG.md) · [第三方组件说明](THIRD_PARTY_NOTICES.md) · [问题反馈](https://github.com/vanvan-program/cove-recipe/issues)
 
@@ -23,23 +23,23 @@
 
 Cove Recipe 是一款中文 Android 个人菜谱本，支持 Android 8.0（API 26）及以上。应用无广告，无需注册账号。菜谱、图片和购物清单只保存在手机上，记录菜谱和做饭都可以离线使用。手动检查更新或下载新版时才会联网。
 
-## v1.5.1 更新
+## v1.5.2 更新
 
-- 稻穗回到左上角。皮革、缝线和暖白纸纹围住整本菜谱，右侧可见三层书页，状态栏沿用封面底色。
-- 菜谱、购物清单、设置三个页签固定在页底。菜谱和购物清单的新增按钮移到列表上方。
-- 修复 GitHub 接口不可用时检查更新失败的问题，备用线路现在直接读取发布附件中的版本清单。
+- 封皮换成浅驼棕皮革，选中的底部页签改为暖褐色。滑动时整张纸带着轻微倾角移出或盖回。
+- 新建菜谱与添加食材采用贴纸按钮，「从菜谱添加」采用相纸按钮，设置分为四张便利贴。
+- 批量清理清单后直接更新列表与数量。单独删除食材后可在数量旁撤销。
 
 ## 界面示例
 
-以下截图取自已发布的 v1.5.1 APK，在 Android 15 模拟器上使用示例菜谱拍摄。
+以下为 Android 16 模拟器上运行 v1.5.2 的截图，使用示例菜谱。也可下载后打开[交互预览 HTML](ui-preview/cove-recipe-notebook.html)。
 
 | 菜谱首页 | 菜谱详情 | 购物清单 |
 | :---: | :---: | :---: |
-| <a href="docs/screenshots/151-home.webp"><img src="docs/screenshots/151-home.webp" width="230" alt="置顶菜谱与准备、烹饪时间" /></a> | <a href="docs/screenshots/151-detail.webp"><img src="docs/screenshots/151-detail.webp" width="230" alt="番茄炒蛋的食材和备菜说明" /></a> | <a href="docs/screenshots/151-shopping.webp"><img src="docs/screenshots/151-shopping.webp" width="230" alt="购物项及其来源菜谱" /></a> |
+| <a href="docs/screenshots/152-home.webp"><img src="docs/screenshots/152-home.webp" width="230" alt="菜谱首页" /></a> | <a href="docs/screenshots/152-detail.webp"><img src="docs/screenshots/152-detail.webp" width="230" alt="菜谱详情" /></a> | <a href="docs/screenshots/152-shopping.webp"><img src="docs/screenshots/152-shopping.webp" width="230" alt="购物清单" /></a> |
 
-| 排序菜单 | 回收站 | 关于版本与下载源 |
+| 设置 | 设置下半页 | 关于版本 |
 | :---: | :---: | :---: |
-| <a href="docs/screenshots/151-sort.webp"><img src="docs/screenshots/151-sort.webp" width="230" alt="首页可选的菜谱排序方式" /></a> | <a href="docs/screenshots/151-trash.webp"><img src="docs/screenshots/151-trash.webp" width="230" alt="回收站内的菜谱及恢复按钮" /></a> | <a href="docs/screenshots/151-about.webp"><img src="docs/screenshots/151-about.webp" width="230" alt="已安装版本 v1.5.1 和下载源设置" /></a> |
+| <a href="docs/screenshots/152-settings.webp"><img src="docs/screenshots/152-settings.webp" width="230" alt="设置" /></a> | <a href="docs/screenshots/152-settings-bottom.webp"><img src="docs/screenshots/152-settings-bottom.webp" width="230" alt="设置下半页" /></a> | <a href="docs/screenshots/152-about.webp"><img src="docs/screenshots/152-about.webp" width="230" alt="关于版本" /></a> |
 
 ## 核心功能
 
